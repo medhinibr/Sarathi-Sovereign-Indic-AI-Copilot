@@ -18,15 +18,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
       - name: Python Syntax and Compilation Check
         run: |
-          # Perform compilation validation check on core modules to prevent runtime syntax failures
-          python -m py_compile api/index.py api/rag_engine.py
+          # Perform compilation validation check on core modules to verify syntax correctness
+          python -m py_compile api/index.py api/rag_engine.py backend/main.py backend/rag_engine.py
 
   frontend-build:
     runs-on: ubuntu-latest
