@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+langchain
+langchain-community
+langchain-groq
+langchain-pinecone
+pypdf
+python-dotenv
+httpx
