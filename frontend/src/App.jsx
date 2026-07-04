@@ -52,7 +52,16 @@ function App() {
   // App states
   const [mode, setMode] = useState("education"); // 'education' or 'healthcare'
   const [selectedLanguage, setSelectedLanguage] = useState("English");
-  const [messages, setMessages] = useState([]);
+  const [shikshaMessages, setShikshaMessages] = useState([]);
+  const [arogyaMessages, setArogyaMessages] = useState([]);
+  const messages = mode === "education" ? shikshaMessages : arogyaMessages;
+  const setMessages = (val) => {
+    if (mode === "education") {
+      setShikshaMessages(val);
+    } else {
+      setArogyaMessages(val);
+    }
+  };
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
@@ -70,11 +79,57 @@ function App() {
   // DOM Refs for scroll handling and input triggering
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   // Auto-scroll to the bottom of the chat on new messages
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
+
+  // Initialize Web Speech API for real-time transcription
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      // Language mapper from selectedLanguage string to BCP-47
+      const langMap = {
+        "English": "en-IN",
+        "Kannada": "kn-IN",
+        "Hindi": "hi-IN",
+        "Tamil": "ta-IN",
+        "Telugu": "te-IN",
+        "Malayalam": "ml-IN",
+        "Marathi": "mr-IN",
+        "Gujarati": "gu-IN",
+        "Bengali": "bn-IN",
+        "Punjabi": "pa-IN",
+        "Odia": "or-IN"
+      };
+
+      recognition.lang = langMap[selectedLanguage] || "en-IN";
+
+      recognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        setInputMessage(transcript);
+      };
+
+      recognition.onerror = (e) => {
+        console.error("Speech recognition error:", e);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, [selectedLanguage]);
 
   // Handle PDF file selection
   const handleFileChange = (e) => {
@@ -172,33 +227,46 @@ function App() {
 
   // Browser Audio Recording for Speech-to-Text (STT)
   const startAudioRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      const chunks = [];
+    if (recognitionRef.current) {
+      try {
+        setIsRecording(true);
+        recognitionRef.current.start();
+      } catch (err) {
+        console.error("Recognition start error:", err);
+      }
+    } else {
+      // Fallback to legacy audio recorder
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream);
+        const chunks = [];
 
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunks.push(e.data);
-        }
-      };
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            chunks.push(e.data);
+          }
+        };
 
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: "audio/wav" });
-        await handleAudioUpload(audioBlob);
-      };
+        recorder.onstop = async () => {
+          const audioBlob = new Blob(chunks, { type: "audio/wav" });
+          await handleAudioUpload(audioBlob);
+        };
 
-      recorder.start();
-      setMediaRecorder(recorder);
-      setIsRecording(true);
-    } catch (err) {
-      console.error("Microphone access denied:", err);
-      alert("Microphone access denied or device not supported.");
+        recorder.start();
+        setMediaRecorder(recorder);
+        setIsRecording(true);
+      } catch (err) {
+        console.error("Microphone access denied:", err);
+        alert("Microphone access denied or device not supported.");
+      }
     }
   };
 
   const stopAudioRecording = () => {
-    if (mediaRecorder && isRecording) {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
       setIsRecording(false);
       // Clean up track bindings to release hardware mic
@@ -206,7 +274,7 @@ function App() {
     }
   };
 
-  // Sends recorded audio blob to backend /api/stt endpoint
+  // Sends recorded audio blob to backend /api/stt endpoint (fallback)
   const handleAudioUpload = async (audioBlob) => {
     const formData = new FormData();
     formData.append("file", audioBlob, "recording.wav");
@@ -221,11 +289,9 @@ function App() {
       if (!response.ok) throw new Error("STT server error");
 
       const data = await response.json();
-      // Populate text field with transcribed text and trigger chat
+      // Populate text field with transcribed text and let user edit it (No auto-send)
       if (data.text) {
         setInputMessage(data.text);
-        // Automatically send the message to make it truly Voice-First
-        handleSendMessage(data.text);
       }
     } catch (err) {
       console.error("STT transaction failed:", err);
@@ -556,7 +622,7 @@ function App() {
                     ? "Listening..." 
                     : `Type or click mic to talk...`
                 }
-                disabled={isRecording}
+                disabled={false}
                 className="flex-1 bg-transparent border-0 outline-none px-4 py-3 text-sm text-slate-800 placeholder-slate-400 disabled:opacity-50"
               />
 

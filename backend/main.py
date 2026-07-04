@@ -175,11 +175,12 @@ async def text_to_speech(request: TTSRequest):
             "api-subscription-key": sarvam_api_key,
             "Content-Type": "application/json"
         }
+        model = "bulbul:v2" if language_code == "en-IN" else "bulbul:v3"
         payload = {
             "text": request.text,
             "speaker": "meera",
             "target_language_code": language_code,
-            "model": "bulbul:v3"
+            "model": model
         }
 
         async with httpx.AsyncClient() as client:
