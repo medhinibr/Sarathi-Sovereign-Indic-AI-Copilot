@@ -30,20 +30,6 @@ The distraction-free chat interface with dynamic Sandalwood or Teal theming depe
 
 ---
 
-## Architecture
-
-Sarathi implements a dual-view single-page application architecture backed by a lightweight serverless FastAPI execution environment. 
-
-### Core Workflow
-1. Ingestion: The user uploads a source document (e.g., school textbook or clinical report). The backend parses the PDF and splits the text into chunks using recursive character partitioning.
-2. Indexing: The text chunks are embedded via a multilingual embedding model and indexed in Pinecone Serverless.
-3. Query Phase: The user submits a question using regional voice input (Kannada, Hindi, etc.). The voice is transcribed into text using Sarvam's speech-to-text API (Saaras v3) and translated to English.
-4. Retrieval: The translated English query is matched against the Pinecone index.
-5. Strict Generation: If relevant contexts are found, they are injected into a strict system prompt. If no relevant contexts are retrieved, the LLM bypasses internal knowledge and returns a translated refusal message.
-6. Speech Synthesis: The synthesized response is translated back into the user's native Indic script and read aloud via Sarvam's text-to-speech engine (Bulbul v3).
-
----
-
 ## Features
 
 ### Strict Retrieval-Augmented Generation (RAG)
