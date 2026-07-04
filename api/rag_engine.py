@@ -163,12 +163,12 @@ def get_system_prompt(mode: str, language: str) -> str:
     """
     # System prompt for Education Mode
     education_prompt = (
-        "You are a rural Indian teacher. Use simple village analogies. Be warm and encouraging."
+        "You are Sarathi, a Sovereign AI Copilot acting as a rural Indian teacher. Use simple village analogies. Be warm and encouraging."
     )
 
     # System prompt for Healthcare Mode
     healthcare_prompt = (
-        "You are a supportive ASHA worker. Simplify medical terms. "
+        "You are Sarathi, a Sovereign AI Copilot acting as a supportive ASHA worker. Simplify medical terms. "
         "STRICT SAFETY RULE: Never diagnose or prescribe medication. Always advise consulting a real doctor. Be reassuring and clear."
     )
 
@@ -184,9 +184,10 @@ def get_system_prompt(mode: str, language: str) -> str:
 
     # Strict constraint instructions for retrieved context alignment
     context_constraint = (
-        "\n\nConstraint: Answer the user's query strictly based on the provided document context. "
-        "If the answer cannot be found in the context, say that the document doesn't contain this information, "
-        "and provide general knowledge instead. Do not make up facts."
+        f"\n\nSTRICT RAG RULE: You MUST answer the user's question using ONLY the provided Context. "
+        f"If the answer is not explicitly found in the Context, you MUST NOT use your internal knowledge. "
+        f"Instead, reply strictly with: \"I am sorry, but this information is not available in the uploaded document. Please ask a question related to the document.\" "
+        f"Translate this refusal to the requested language ({language}) using native characters/script."
     )
 
     return base_persona + language_instructions + context_constraint
@@ -210,14 +211,36 @@ def query_rag_system(query: str, mode: str, language: str) -> str:
     # Retrieve relevant source chunks from the Pinecone vector database using the translated query
     docs = vector_db.similarity_search(search_query, k=4)
     context_pieces = [doc.page_content for doc in docs]
-    context = "\n---\n".join(context_pieces) if context_pieces else "No relevant document context found."
+    context = "\n---\n".join(context_pieces) if context_pieces else ""
+
+    # Check if we have no chunks retrieved
+    if not context_pieces or not context.strip():
+        refusal_en = "I am sorry, but this information is not available in the uploaded document. Please ask a question related to the document."
+        if language == "English":
+            return refusal_en
+        else:
+            try:
+                translator_llm = ChatGroq(
+                    groq_api_key=GROQ_API_KEY,
+                    model="llama-3.1-8b-instant",
+                    temperature=0.0
+                )
+                messages = [
+                    ("system", f"You are a professional translator. Translate the refusal message to {language} (using native {language} characters/script). Return ONLY the translation, nothing else."),
+                    ("user", refusal_en)
+                ]
+                response = translator_llm.invoke(messages)
+                return response.content.strip()
+            except Exception as e:
+                print(f"Refusal translation failed: {e}")
+                return refusal_en
 
     try:
         # Initialize LangChain ChatGroq wrapper for LLaMA inference
         llm = ChatGroq(
             groq_api_key=GROQ_API_KEY,
             model=LLM_MODEL,
-            temperature=0.6
+            temperature=0.0  # Set temperature to 0.0 for strict facts adherence
         )
 
         system_message = get_system_prompt(mode, language)
@@ -226,8 +249,8 @@ def query_rag_system(query: str, mode: str, language: str) -> str:
             user_message = (
                 f"Document Context:\n{context}\n\n"
                 f"User Query: {search_query}\n\n"
-                f"Please answer the user query based on the context, and translate your entire final response to {language}. "
-                f"Write the response using native {language} characters."
+                f"Please answer the user query based strictly on the context, and translate your entire final response to {language}. "
+                f"Write the response using native {language} characters. If the answer is not explicitly found in the context, output the exact refusal message."
             )
         else:
             user_message = f"Document Context:\n{context}\n\nUser Query: {query}"
