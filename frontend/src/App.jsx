@@ -430,79 +430,122 @@ function App() {
 
   if (view === "landing") {
     return (
-      <div className="min-h-screen w-screen bg-[#FAF7F2] text-slate-800 flex flex-col font-sans overflow-x-hidden relative">
+      <div className="min-h-screen w-screen bg-[#030712] text-slate-100 flex flex-col font-sans overflow-x-hidden relative">
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-          .indian-title {
-            font-family: 'Playfair Display', serif;
-          }
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;650&display=swap');
           body {
             font-family: 'Plus Jakarta Sans', sans-serif;
           }
-          .custom-gradient-glow {
-            background: radial-gradient(circle, rgba(217,119,6,0.06) 0%, rgba(15,118,110,0.04) 50%, rgba(250,247,242,0) 100%);
+          .code-font {
+            font-family: 'JetBrains Mono', monospace;
+          }
+          .custom-gradient-glow-1 {
+            background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, rgba(37,99,235,0.03) 50%, rgba(3,7,18,0) 100%);
+          }
+          .custom-gradient-glow-2 {
+            background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, rgba(4,120,87,0.02) 50%, rgba(3,7,18,0) 100%);
           }
         `}</style>
 
         {/* Ambient Gradient Background Glows */}
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] custom-gradient-glow pointer-events-none rounded-full blur-3xl z-0"></div>
+        <div className="absolute top-0 left-1/4 w-[700px] h-[700px] custom-gradient-glow-1 pointer-events-none rounded-full blur-3xl z-0"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-[600px] h-[600px] custom-gradient-glow-2 pointer-events-none rounded-full blur-3xl z-0"></div>
 
         {/* Top Header / Navigation */}
-        <header className="w-full h-20 px-8 lg:px-16 flex items-center justify-between border-b border-[#E5DEC9]/80 bg-[#FAF7F2]/80 backdrop-blur-md z-10 sticky top-0">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-amber-500"></span>
-            <span className="indian-title text-2xl font-bold tracking-tight text-[#1E1B4B]">Sarathi</span>
+        <header className="w-full h-20 px-8 lg:px-16 flex items-center justify-between border-b border-slate-900 bg-[#030712]/80 backdrop-blur-md z-10 sticky top-0">
+          <div className="flex items-center gap-2.5">
+            <span className="h-3 w-3 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"></span>
+            <span className="text-xl font-extrabold tracking-tight text-white font-sans">sarvam.sarathi</span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-600">
-            <a href="#modes" className="hover:text-[#1E1B4B] transition-colors">App Modes</a>
-            <a href="#architecture" className="hover:text-[#1E1B4B] transition-colors">Sovereign RAG</a>
+          <nav className="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <a href="#modes" className="hover:text-white transition-colors">App Modes</a>
+            <a href="#architecture" className="hover:text-white transition-colors">Sovereign RAG</a>
           </nav>
 
           <button
             onClick={() => setView("chat")}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#1E1B4B] hover:bg-[#2D2A6B] text-white text-xs font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#3B82F6] hover:bg-blue-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all transform hover:-translate-y-0.5 cursor-pointer"
           >
             Launch Copilot <Sparkles size={14} />
           </button>
         </header>
 
         {/* Hero Section */}
-        <section className="flex-1 max-w-6xl mx-auto px-8 lg:px-16 flex flex-col items-center justify-center text-center py-20 lg:py-28 relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-full text-[10px] font-bold uppercase tracking-widest">
-            <Sparkles size={10} className="text-amber-600" /> Voice-First Sovereign AI
+        <section className="max-w-6xl mx-auto px-8 lg:px-16 flex flex-col lg:flex-row items-center justify-between gap-12 py-16 lg:py-24 relative z-10">
+          
+          {/* Hero Left Content */}
+          <div className="flex-1 flex flex-col items-start text-left space-y-6">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-950/40 border border-blue-900/60 text-blue-400 rounded-full text-[10px] font-bold uppercase tracking-widest">
+              <Sparkles size={10} className="text-blue-400" /> India's Sovereign AI Platform
+            </div>
+
+            <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight max-w-xl font-sans">
+              Voice-First Sovereign AI for Indic contexts.
+            </h1>
+
+            <p className="text-sm lg:text-base text-slate-400 max-w-lg leading-relaxed font-medium">
+              Sarathi is a production-grade document intelligence copilot powered by Sarvam AI speech models. Ingest text, textbooks, or clinical documents, and query strictly within context boundaries in native Indic languages.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto pt-2">
+              <button
+                onClick={() => setView("chat")}
+                className="w-full sm:w-auto px-7 py-3.5 bg-[#3B82F6] hover:bg-blue-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                Launch Workspace <ChevronRight size={14} />
+              </button>
+              <a
+                href="#modes"
+                className="w-full sm:w-auto px-7 py-3.5 bg-slate-900/60 border border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                Explore Use Cases
+              </a>
+            </div>
           </div>
 
-          <h1 className="indian-title text-5xl lg:text-7xl font-bold tracking-tight text-[#1E1B4B] leading-tight max-w-4xl">
-            Empowering Rural India with Sovereign Context-Bound AI
-          </h1>
+          {/* Hero Right Code Snippet Visual */}
+          <div className="flex-1 w-full max-w-xl bg-[#0B0F19] border border-slate-800 rounded-2xl p-5 shadow-2xl relative overflow-hidden text-left">
+            <div className="flex justify-between items-center border-b border-slate-900 pb-3 mb-4">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              </div>
+              <span className="text-[10px] text-slate-500 font-mono">sarathi_sdk.py</span>
+            </div>
 
-          <p className="text-base lg:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-medium">
-            Bridging language barriers with real-time speech and context-bound document intelligence. Designed to assist regional educators and healthcare workers in their native languages.
-          </p>
+            <pre className="code-font text-[11px] leading-relaxed text-slate-300 overflow-x-auto">
+              <code className="block font-mono">
+<span className="text-pink-400">from</span> sarathi <span className="text-pink-400">import</span> SarathiCopilot<br /><br />
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <button
-              onClick={() => setView("chat")}
-              className="w-full sm:w-auto px-8 py-4 bg-[#D97706] hover:bg-[#B45309] text-white text-sm font-bold rounded-2xl shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              Start Chat Assistant <ChevronRight size={16} />
-            </button>
-            <a
-              href="#modes"
-              className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-[#E5DEC9] hover:bg-[#FAF7F2] text-slate-700 text-sm font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
-            >
-              Explore Use Cases
-            </a>
+copilot = SarathiCopilot(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;api_key=<span className="text-emerald-400">"YOUR_SARVAM_KEY"</span>,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;mode=<span className="text-emerald-400">"shiksha"</span>,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-slate-500"># Or "arogya"</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;language=<span className="text-emerald-400">"kannada"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-slate-500"># Native Indic tongue</span><br />
+)<br /><br />
+
+<span className="text-slate-500"># Ingest document text for context binding</span><br />
+copilot.ingest_document(<span className="text-emerald-400">"science_chapter_8.pdf"</span>)<br /><br />
+
+<span className="text-slate-500"># Query strictly matches context; refuses if missing</span><br />
+response = copilot.ask(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;query=<span className="text-emerald-400">"ಕಿರಣಗಳು ಹೇಗೆ ಎಲೆಯಲ್ಲಿ ಆಹಾರವಾಗುತ್ತವೆ?"</span><br />
+)<br /><br />
+<span className="text-blue-400">print</span>(response.text)<br />
+<span className="text-slate-500"># &gt;&gt; "ಇದು ಅಮ್ಮ ಅಡುಗೆ ಮನೆಯಲ್ಲಿ ಒಲೆ ಹಚ್ಚಿ..."</span>
+              </code>
+            </pre>
           </div>
+
         </section>
 
         {/* Modes Section */}
-        <section id="modes" className="w-full bg-[#F3EDE2]/60 border-y border-[#E5DEC9]/80 py-20 px-8 lg:px-16 relative z-10">
+        <section id="modes" className="w-full bg-[#070A13] border-y border-slate-900 py-20 px-8 lg:px-16 relative z-10">
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="text-center space-y-3">
-              <h2 className="indian-title text-4xl font-bold text-[#1E1B4B]">Dual Dedicated Environments</h2>
-              <p className="text-xs text-amber-800 uppercase tracking-widest font-extrabold">Tailored interfaces for specialized domain tasks</p>
+              <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-white font-sans">Dual Dedicated Environments</h2>
+              <p className="text-xs text-blue-400 uppercase tracking-widest font-bold font-mono">Tailored interfaces for specialized domain tasks</p>
             </div>
 
             {/* Split Panel Setup */}
@@ -516,18 +559,18 @@ function App() {
                   onClick={() => setActiveLandingTab("education")}
                   className={`p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex gap-4 ${
                     activeLandingTab === "education" 
-                      ? "bg-white border-[#D97706] shadow-md translate-x-1" 
-                      : "bg-white/40 border-[#E5DEC9] opacity-75 hover:opacity-100"
+                      ? "bg-[#0F172A]/70 border-blue-500 shadow-md shadow-blue-500/5 translate-x-1" 
+                      : "bg-[#0F172A]/20 border-slate-900 opacity-75 hover:opacity-100"
                   }`}
                 >
                   <div className={`h-12 w-12 rounded-xl shrink-0 flex items-center justify-center border ${
-                    activeLandingTab === "education" ? "bg-amber-50 border-amber-200 text-amber-700" : "bg-slate-100 border-slate-200 text-slate-500"
+                    activeLandingTab === "education" ? "bg-blue-950/40 border-blue-900 text-blue-400" : "bg-slate-950 border-slate-800 text-slate-500"
                   }`}>
                     <BookOpen size={22} />
                   </div>
                   <div className="space-y-1 text-left">
-                    <h3 className="indian-title text-xl font-bold text-[#1E1B4B]">🎓 Shiksha Mode</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="text-lg font-bold text-white font-sans">🎓 Shiksha Mode</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed font-sans">
                       Custom analogies and conceptual breakdown tools tailored for regional school classrooms.
                     </p>
                   </div>
@@ -538,18 +581,18 @@ function App() {
                   onClick={() => setActiveLandingTab("healthcare")}
                   className={`p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex gap-4 ${
                     activeLandingTab === "healthcare" 
-                      ? "bg-white border-[#0F766E] shadow-md translate-x-1" 
-                      : "bg-white/40 border-[#E5DEC9] opacity-75 hover:opacity-100"
+                      ? "bg-[#0F172A]/70 border-emerald-500 shadow-md shadow-emerald-500/5 translate-x-1" 
+                      : "bg-[#0F172A]/20 border-slate-900 opacity-75 hover:opacity-100"
                   }`}
                 >
                   <div className={`h-12 w-12 rounded-xl shrink-0 flex items-center justify-center border ${
-                    activeLandingTab === "healthcare" ? "bg-teal-50 border-teal-200 text-teal-700" : "bg-slate-100 border-slate-200 text-slate-500"
+                    activeLandingTab === "healthcare" ? "bg-emerald-950/40 border-emerald-900 text-emerald-400" : "bg-slate-950 border-slate-800 text-slate-500"
                   }`}>
                     <Stethoscope size={22} />
                   </div>
                   <div className="space-y-1 text-left">
-                    <h3 className="indian-title text-xl font-bold text-[#1E1B4B]">⚕️ Arogya Mode</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="text-lg font-bold text-white font-sans">⚕️ Arogya Mode</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed font-sans">
                       Clinical report translation, vocabulary simplification and symptom analysis without diagnosis.
                     </p>
                   </div>
@@ -563,8 +606,8 @@ function App() {
                     }}
                     className={`px-6 py-3 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer ${
                       activeLandingTab === "education" 
-                        ? "bg-[#D97706] hover:bg-[#B45309] text-white" 
-                        : "bg-[#0F766E] hover:bg-[#115E59] text-white"
+                        ? "bg-blue-500 hover:bg-blue-600 text-white shadow-blue-500/10" 
+                        : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/10"
                     }`}
                   >
                     Open {activeLandingTab === "education" ? "Shiksha" : "Arogya"} Workspace →
@@ -573,19 +616,19 @@ function App() {
               </div>
 
               {/* Right Column Interactive Live Mockup Device */}
-              <div className="lg:col-span-7 bg-[#1E1B4B] rounded-3xl p-6 text-white border border-[#312E81] shadow-2xl flex flex-col justify-between min-h-[360px] relative overflow-hidden">
+              <div className="lg:col-span-7 bg-[#0B0F19] rounded-3xl p-6 text-white border border-slate-800 shadow-2xl flex flex-col justify-between min-h-[360px] relative overflow-hidden">
                 {/* Ambient glow inside device mockup */}
-                <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl"></div>
+                <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/5 rounded-full blur-2xl"></div>
                 
                 {/* Header Mockup */}
-                <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                <div className="flex justify-between items-center border-b border-slate-900 pb-3 mb-4">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 font-mono">
                       Sarathi Sandbox - {activeLandingTab === "education" ? "Shiksha" : "Arogya"}
                     </span>
                   </div>
-                  <span className="text-[9px] bg-slate-850 px-2 py-0.5 rounded border border-slate-700 text-slate-400 font-mono">
+                  <span className="text-[9px] bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-slate-500 font-mono">
                     active-context: bound
                   </span>
                 </div>
@@ -596,8 +639,8 @@ function App() {
                     <>
                       {/* User Bubble */}
                       <div className="flex justify-end">
-                        <div className="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-3.5 max-w-[85%] text-slate-200 text-left">
-                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-indigo-400 font-bold uppercase tracking-wider">
+                        <div className="bg-[#1E293B]/70 border border-slate-800 rounded-2xl p-3.5 max-w-[85%] text-slate-200 text-left font-sans">
+                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-blue-400 font-bold uppercase tracking-wider font-mono">
                             <Mic size={10} /> Voice Query (Kannada)
                           </div>
                           ಕಿರಣಗಳು ಹೇಗೆ ಎಲೆಯಲ್ಲಿ ಆಹಾರವಾಗುತ್ತವೆ?
@@ -606,8 +649,8 @@ function App() {
                       
                       {/* Bot Bubble */}
                       <div className="flex justify-start">
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 max-w-[85%] text-slate-350 text-left">
-                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-amber-500 font-bold uppercase tracking-wider">
+                        <div className="bg-[#0F172A]/50 border border-slate-900 rounded-2xl p-3.5 max-w-[85%] text-slate-400 text-left font-sans">
+                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-amber-500 font-bold uppercase tracking-wider font-mono">
                             <BookOpen size={10} /> Explaining Photosynthesis
                           </div>
                           ಇದು ಅಮ್ಮ ಅಡುಗೆ ಮನೆಯಲ್ಲಿ ಒಲೆ ಹಚ್ಚಿ ಅಡುಗೆ ಮಾಡುವಂತೆ. ಸೂರ್ಯನ ಬೆಳಕು ಒಲೆಯ ಬೆಂಕಿ ಇದ್ದ ಹಾಗೆ, ಎಲೆಯು ಅಡುಗೆ ಪಾತ್ರೆ ಇದ್ದ ಹಾಗೆ. ಎಲೆಯು ಬೆಳಕನ್ನು ಬಳಸಿ ನೀರು ಮತ್ತು ಗಾಳಿಯಿಂದ ಗಿಡಕ್ಕೆ ಬೇಕಾದ ಆಹಾರ ತಯಾರಿಸುತ್ತದೆ.
@@ -618,8 +661,8 @@ function App() {
                     <>
                       {/* User Bubble */}
                       <div className="flex justify-end">
-                        <div className="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-3.5 max-w-[85%] text-slate-200 text-left">
-                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-indigo-400 font-bold uppercase tracking-wider">
+                        <div className="bg-[#1E293B]/70 border border-slate-800 rounded-2xl p-3.5 max-w-[85%] text-slate-200 text-left font-sans">
+                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-blue-400 font-bold uppercase tracking-wider font-mono">
                             <Mic size={10} /> Voice Query (Hindi)
                           </div>
                           मेरी रिपोर्ट में ब्लड प्रेशर 140/90 है, इसका क्या मतलब है?
@@ -628,8 +671,8 @@ function App() {
                       
                       {/* Bot Bubble */}
                       <div className="flex justify-start">
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 max-w-[85%] text-slate-350 text-left">
-                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-teal-400 font-bold uppercase tracking-wider">
+                        <div className="bg-[#0F172A]/50 border border-slate-900 rounded-2xl p-3.5 max-w-[85%] text-slate-400 text-left font-sans">
+                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-emerald-400 font-bold uppercase tracking-wider font-mono">
                             <Stethoscope size={10} /> Clinical Summary (Non-Diagnostic)
                           </div>
                           यह ब्लड प्रेशर (140/90 mmHg) सामान्य स्तर से थोड़ा अधिक है, जिसे माइल्ड हाइपरटेंशन (Mild Hypertension) कहते हैं। कृपया नमक का सेवन कम करें और उचित मार्गदर्शन के लिए अपने नजदीकी डॉक्टर या आशा कार्यकर्ता से संपर्क करें।
@@ -640,10 +683,10 @@ function App() {
                 </div>
 
                 {/* Footer Input Mockup */}
-                <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                <div className="mt-4 pt-3 border-t border-slate-900 flex items-center justify-between text-[10px] text-slate-600 font-mono">
                   <span>Speech-to-Speech active</span>
                   <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> bulbul:v3 engine
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse font-mono"></span> bulbul:v3 engine
                   </span>
                 </div>
 
@@ -657,95 +700,91 @@ function App() {
         <section id="architecture" className="w-full py-20 px-8 lg:px-16 relative z-10">
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="text-center space-y-3">
-              <h2 className="indian-title text-4xl font-bold text-[#1E1B4B]">Sovereign Context-Bound RAG Flow</h2>
-              <p className="text-xs text-teal-800 uppercase tracking-widest font-extrabold">End-to-End Multilingual Query Execution Pipeline</p>
+              <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-white font-sans">Sovereign Context-Bound RAG Flow</h2>
+              <p className="text-xs text-blue-400 uppercase tracking-widest font-bold font-mono">End-to-End Multilingual Query Execution Pipeline</p>
             </div>
 
             {/* Visualizer Flow Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-4 relative">
               
               {/* Step 1 */}
-              <div className="bg-white border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
+              <div className="bg-[#0B0F19] border border-slate-900 rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
                 <div className="space-y-3 text-left">
-                  <div className="inline-flex px-2 py-0.5 bg-indigo-50 border border-indigo-200 text-[#1E1B4B] rounded text-[9px] font-bold">
+                  <div className="inline-flex px-2 py-0.5 bg-blue-950/40 border border-blue-900 text-blue-400 rounded text-[9px] font-bold font-mono">
                     STEP 01
                   </div>
-                  <h4 className="font-bold text-sm text-slate-800 font-sans">Multilingual Input</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                  <h4 className="font-bold text-sm text-white font-sans font-sans">Multilingual Input</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed font-sans font-sans">
                     ASHA workers or teachers speak queries in Indic dialects or upload documents. Audio is transcribed via Sarvam's Saaras v3.
                   </p>
                 </div>
-                <div className="h-1.5 w-full bg-indigo-200 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full bg-indigo-600 w-1/4 animate-pulse"></div>
+                <div className="h-1.5 w-full bg-slate-900 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full bg-blue-600 w-1/4 animate-pulse"></div>
                 </div>
               </div>
 
               {/* Step 2 */}
-              <div className="bg-white border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
+              <div className="bg-[#0B0F19] border border-slate-900 rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
                 <div className="space-y-3 text-left">
-                  <div className="inline-flex px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-800 rounded text-[9px] font-bold">
+                  <div className="inline-flex px-2 py-0.5 bg-blue-950/40 border border-blue-900 text-blue-400 rounded text-[9px] font-bold font-mono">
                     STEP 02
                   </div>
-                  <h4 className="font-bold text-sm text-slate-800 font-sans">English Cross-Translation</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                  <h4 className="font-bold text-sm text-white font-sans font-sans font-sans">English Cross-Translation</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed font-sans font-sans font-sans">
                     To query English document indices, the query translates internally, keeping semantic keys intact for cross-lingual matches.
                   </p>
                 </div>
-                <div className="h-1.5 w-full bg-amber-200 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full bg-amber-600 w-2/4"></div>
+                <div className="h-1.5 w-full bg-slate-900 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full bg-blue-600 w-2/4 font-mono"></div>
                 </div>
               </div>
 
               {/* Step 3 */}
-              <div className="bg-white border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
+              <div className="bg-[#0B0F19] border border-slate-900 rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
                 <div className="space-y-3 text-left">
-                  <div className="inline-flex px-2 py-0.5 bg-teal-50 border border-teal-200 text-teal-800 rounded text-[9px] font-bold">
+                  <div className="inline-flex px-2 py-0.5 bg-blue-950/40 border border-blue-900 text-blue-400 rounded text-[9px] font-bold font-mono">
                     STEP 03
                   </div>
-                  <h4 className="font-bold text-sm text-slate-800 font-sans">Strict Context Retrieving</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                  <h4 className="font-bold text-sm text-white font-sans font-sans font-sans">Strict Context Retrieving</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed font-sans font-sans font-sans">
                     Fetches top matching chunks from Pinecone. If context is empty, it bypasses the LLM to return translated refusal.
                   </p>
                 </div>
-                <div className="h-1.5 w-full bg-teal-200 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full bg-teal-600 w-3/4"></div>
+                <div className="h-1.5 w-full bg-slate-900 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full bg-blue-600 w-3/4 font-mono"></div>
                 </div>
               </div>
 
               {/* Step 4 */}
-              <div className="bg-white border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
+              <div className="bg-[#0B0F19] border border-slate-900 rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
                 <div className="space-y-3 text-left">
-                  <div className="inline-flex px-2 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded text-[9px] font-bold">
+                  <div className="inline-flex px-2 py-0.5 bg-blue-950/40 border border-blue-900 text-blue-400 rounded text-[9px] font-bold font-mono">
                     STEP 04
                   </div>
-                  <h4 className="font-bold text-sm text-slate-800 font-sans">Indic Synthesis & TTS</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                  <h4 className="font-bold text-sm text-white font-sans font-sans font-sans">Indic Synthesis & TTS</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed font-sans font-sans font-sans font-sans">
                     Generates fact-bound response, translates to local language, and delivers regional speech audio via Bulbul v3.
                   </p>
                 </div>
-                <div className="h-1.5 w-full bg-emerald-200 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full bg-emerald-600 w-full"></div>
+                <div className="h-1.5 w-full bg-slate-900 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full bg-blue-600 w-full font-mono"></div>
                 </div>
               </div>
 
             </div>
 
             {/* Trust Banner Inside Architecture */}
-            <div className="bg-[#1E1B4B] rounded-3xl p-8 border border-[#312E81] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+            <div className="bg-[#0B0F19] rounded-3xl p-8 border border-slate-850 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-full bg-cover opacity-5 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/black-linen.png")' }}></div>
               <div className="space-y-2 z-10 text-center md:text-left">
-                <h3 className="indian-title text-2xl font-bold">Safe, Hallucination-Free Guardrails</h3>
-                <p className="text-xs text-slate-350 max-w-xl font-sans">
+                <h3 className="text-xl font-bold text-white font-sans">Safe, Hallucination-Free Guardrails</h3>
+                <p className="text-xs text-slate-400 max-w-xl font-sans font-sans">
                   Unlike conventional LLMs, Sarathi operates as a closed-loop system. It has 0% tolerance for internal knowledge leakage, protecting rural patients and students from misinformation.
                 </p>
               </div>
-              <div className="flex gap-4 shrink-0 z-10 font-sans">
-                <div className="text-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+              <div className="flex gap-4 shrink-0 z-10 font-sans font-sans">
+                <div className="text-center px-4 py-2 bg-slate-900/60 rounded-xl border border-slate-800 font-mono">
                   <div className="text-xl font-bold text-emerald-400">0%</div>
-                  <div className="text-[9px] text-slate-400 uppercase font-mono">Hallucinations</div>
-                </div>
-                <div className="text-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-xl font-bold text-amber-400">10+</div>
                   <div className="text-[9px] text-slate-400 uppercase font-mono">Indic Scripts</div>
                 </div>
               </div>
