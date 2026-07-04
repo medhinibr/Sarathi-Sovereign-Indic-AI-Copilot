@@ -17,7 +17,7 @@ PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "sarathi-db")
 PINECONE_INDEX_HOST = os.getenv("PINECONE_INDEX_HOST", "https://sarathi-db-szh18us.svc.aped-4627-b74a.pinecone.io")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-LLM_MODEL = os.getenv("LLM_MODEL", "llama3-8b-8192")
+LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
 
 # Initialize Pinecone embeddings model
 # multilingual-e5-large is a high-performance model hosted on Pinecone's serverless inference endpoints (Dimension 1024)
