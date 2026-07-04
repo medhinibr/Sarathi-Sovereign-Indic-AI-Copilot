@@ -13,7 +13,12 @@ import {
   Loader2,
   HelpCircle,
   Activity,
-  Globe
+  Globe,
+  ArrowLeft,
+  ChevronRight,
+  Sparkles,
+  Shield,
+  Languages
 } from "lucide-react";
 
 // Determine API base URL dynamically based on environment configuration
@@ -52,6 +57,7 @@ function App() {
   // App states
   const [mode, setMode] = useState("education"); // 'education' or 'healthcare'
   const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const [view, setView] = useState("landing"); // 'landing' | 'chat'
   const [shikshaMessages, setShikshaMessages] = useState([]);
   const [arogyaMessages, setArogyaMessages] = useState([]);
   const messages = mode === "education" ? shikshaMessages : arogyaMessages;
@@ -421,6 +427,185 @@ function App() {
     accentText: mode === "education" ? "text-[#D97706]" : "text-[#0F766E]"
   };
 
+  if (view === "landing") {
+    return (
+      <div className="min-h-screen w-screen bg-[#FAF7F2] text-slate-800 flex flex-col font-sans overflow-x-hidden relative">
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+          .indian-title {
+            font-family: 'Playfair Display', serif;
+          }
+          body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+          }
+          .custom-gradient-glow {
+            background: radial-gradient(circle, rgba(217,119,6,0.06) 0%, rgba(15,118,110,0.04) 50%, rgba(250,247,242,0) 100%);
+          }
+        `}</style>
+
+        {/* Ambient Gradient Background Glows */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] custom-gradient-glow pointer-events-none rounded-full blur-3xl z-0"></div>
+
+        {/* Top Header / Navigation */}
+        <header className="w-full h-20 px-8 lg:px-16 flex items-center justify-between border-b border-[#E5DEC9]/80 bg-[#FAF7F2]/80 backdrop-blur-md z-10 sticky top-0">
+          <div className="flex items-center gap-2">
+            <span className="h-3 w-3 rounded-full bg-amber-500"></span>
+            <span className="indian-title text-2xl font-bold tracking-tight text-[#1E1B4B]">Sarathi</span>
+          </div>
+
+          <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-600">
+            <a href="#features" className="hover:text-[#1E1B4B] transition-colors">Features</a>
+            <a href="#modes" className="hover:text-[#1E1B4B] transition-colors">App Modes</a>
+            <a href="#architecture" className="hover:text-[#1E1B4B] transition-colors">Sovereign RAG</a>
+          </nav>
+
+          <button
+            onClick={() => setView("chat")}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#1E1B4B] hover:bg-[#2D2A6B] text-white text-xs font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
+          >
+            Launch Copilot <Sparkles size={14} />
+          </button>
+        </header>
+
+        {/* Hero Section */}
+        <section className="flex-1 max-w-6xl mx-auto px-8 lg:px-16 flex flex-col items-center justify-center text-center py-20 lg:py-28 relative z-10 space-y-6">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-full text-[10px] font-bold uppercase tracking-widest">
+            <Sparkles size={10} className="text-amber-600" /> Voice-First Sovereign AI
+          </div>
+
+          <h1 className="indian-title text-5xl lg:text-7xl font-bold tracking-tight text-[#1E1B4B] leading-tight max-w-4xl">
+            Empowering Rural India with Sovereign Context-Bound AI
+          </h1>
+
+          <p className="text-base lg:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-medium">
+            Bridging language barriers with real-time speech and context-bound document intelligence. Designed to assist regional educators and healthcare workers in their native languages.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <button
+              onClick={() => setView("chat")}
+              className="w-full sm:w-auto px-8 py-4 bg-[#D97706] hover:bg-[#B45309] text-white text-sm font-bold rounded-2xl shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              Start Chat Assistant <ChevronRight size={16} />
+            </button>
+            <a
+              href="#modes"
+              className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-[#E5DEC9] hover:bg-[#FAF7F2] text-slate-700 text-sm font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
+            >
+              Explore Use Cases
+            </a>
+          </div>
+        </section>
+
+        {/* Modes Section */}
+        <section id="modes" className="w-full bg-[#F3EDE2]/60 border-y border-[#E5DEC9]/80 py-20 px-8 lg:px-16 relative z-10">
+          <div className="max-w-6xl mx-auto space-y-12">
+            <div className="text-center space-y-2">
+              <h2 className="indian-title text-3xl lg:text-4xl font-bold text-[#1E1B4B]">Dual Dedicated Environments</h2>
+              <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Two specialized modes serving distinct societal needs</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Shiksha Card */}
+              <div className="bg-white border border-[#E5DEC9] rounded-3xl p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300">
+                <div className="space-y-4">
+                  <div className="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-200">
+                    <BookOpen size={24} />
+                  </div>
+                  <h3 className="indian-title text-2xl font-bold text-[#1E1B4B]">🎓 Shiksha Mode</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Designed for rural classroom teachers and local students. Ingest textbooks and generate lesson plans or simplify complex scientific concepts with village analogies in Kannada, Hindi, and more.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setMode("education");
+                    setView("chat");
+                  }}
+                  className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-[#D97706] hover:text-[#B45309] transition-colors cursor-pointer"
+                >
+                  Launch Shiksha Copilot <ChevronRight size={14} />
+                </button>
+              </div>
+
+              {/* Arogya Card */}
+              <div className="bg-white border border-[#E5DEC9] rounded-3xl p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300">
+                <div className="space-y-4">
+                  <div className="h-12 w-12 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-600 border border-teal-200">
+                    <Stethoscope size={24} />
+                  </div>
+                  <h3 className="indian-title text-2xl font-bold text-[#1E1B4B]">⚕️ Arogya Mode</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Assisting ASHA workers and rural patients. Simplifies dense English clinical documents, prescription scripts, and lab reports into easy regional language summaries, strictly omitting self-diagnosis.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setMode("healthcare");
+                    setView("chat");
+                  }}
+                  className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-[#0F766E] hover:text-[#115E59] transition-colors cursor-pointer"
+                >
+                  Launch Arogya Copilot <ChevronRight size={14} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features / Capabilities */}
+        <section id="features" className="w-full py-20 px-8 lg:px-16 relative z-10">
+          <div className="max-w-6xl mx-auto space-y-12">
+            <div className="text-center space-y-2">
+              <h2 className="indian-title text-3xl lg:text-4xl font-bold text-[#1E1B4B]">Engineered for Local Accessibility</h2>
+              <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Cutting-edge Sovereign AI Technologies</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Feature 1 */}
+              <div className="space-y-3">
+                <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-[#1E1B4B]">
+                  <Mic size={20} />
+                </div>
+                <h4 className="font-bold text-base text-slate-800">Voice-First Interface</h4>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Real-time regional transcription and natural sounding text-to-speech speaker synthesis designed for low-literacy segments.
+                </p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="space-y-3">
+                <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-[#1E1B4B]">
+                  <Shield size={20} />
+                </div>
+                <h4 className="font-bold text-base text-slate-800">Strict Context Security</h4>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Engineered with hard context-bound vector retrieval boundaries. The LLM refuses to answer when information falls outside the uploaded document.
+                </p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="space-y-3">
+                <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-[#1E1B4B]">
+                  <Languages size={20} />
+                </div>
+                <h4 className="font-bold text-base text-slate-800">Cross-Lingual Indexing</h4>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Automatic translation pipeline translates regional language speech queries to English for precise vector search operations.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="w-full border-t border-[#E5DEC9]/80 py-8 px-8 lg:px-16 text-center text-xs text-slate-400">
+          <p>© {new Date().getFullYear()} Sarathi AI. All rights reserved.</p>
+        </footer>
+      </div>
+    );
+  }
+
   return (
     <div className={`flex h-screen w-screen overflow-hidden ${theme.bg} ${theme.text} font-sans transition-colors duration-300 relative`}>
       {/* Inject custom Google Fonts & styles */}
@@ -437,22 +622,18 @@ function App() {
         }
       `}</style>
 
-      {/* Sidebar - Control, Ingestion & Developer Diagnostics Panel */}
+      {/* Sidebar - Control & Ingestion Panel */}
       <div className={`w-80 flex flex-col border-r ${theme.border} ${theme.sidebarBg} p-6 space-y-5 transition-all duration-300 overflow-y-auto`}>
         
         {/* App Logo and Branding Header */}
         <div className="border-b border-[#E5DEC9] pb-4">
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-ping"></span>
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
             <h1 className="text-2xl font-bold tracking-tight text-[#1E1B4B] flex items-center gap-2">
               Sarathi
             </h1>
           </div>
           <p className="text-[10px] text-amber-800 font-bold uppercase tracking-widest mt-0.5">Sovereign Indic AI Copilot</p>
-          <div className="inline-flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-100 text-[9px] font-bold text-indigo-700">
-            <span className="w-1 h-1 rounded-full bg-indigo-500"></span>
-            Sarvam Open AI APIs Connected
-          </div>
         </div>
 
         {/* PDF Document Ingestion Container */}
@@ -554,57 +735,6 @@ function App() {
           </div>
         </div>
 
-        {/* Developer Diagnostics & API Live Metrics Panel */}
-        <div className="flex flex-col space-y-2 border-t border-[#E5DEC9] pt-4">
-          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Developer API Panel</label>
-          <div className="bg-white/80 border border-[#E5DEC9] rounded-2xl p-4 space-y-3 text-[11px] shadow-sm">
-            
-            {/* API Status States */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">STT Engine</span>
-                <span className="font-bold text-emerald-700 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> saaras:v3
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">TTS Engine</span>
-                <span className="font-bold text-emerald-700 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> bulbul:v3
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">Vector Index</span>
-                <span className="font-bold text-indigo-700 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> pinecone-e5
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">LLM Mode</span>
-                <span className="font-bold text-indigo-700 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> LLaMA (temp=0)
-                </span>
-              </div>
-            </div>
-
-            {/* Performance Indicators */}
-            <div className="border-t border-slate-100 pt-2.5 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">Last API Latency</span>
-                <span className="font-bold text-slate-800">{apiLatency ? `${apiLatency} ms` : "No requests yet"}</span>
-              </div>
-            </div>
-
-            {/* Debug console trigger */}
-            <button
-              onClick={() => setShowDebugConsole(true)}
-              className="w-full mt-1.5 py-1.5 bg-[#1E1B4B] hover:bg-[#2E2B6B] text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center cursor-pointer"
-            >
-              Open API Request/Response Log
-            </button>
-          </div>
-        </div>
-
       </div>
 
       {/* Main Chat Workspace */}
@@ -655,11 +785,13 @@ function App() {
               </select>
             </div>
 
-            {/* Recruiter / Project context badge */}
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E1B4B] text-white rounded-xl text-xs font-bold shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-              Sarvam AI Stack Intern Prototype
-            </div>
+            {/* Back to Home Button */}
+            <button
+              onClick={() => setView("landing")}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1E1B4B] hover:bg-[#2D2A6B] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+            >
+              <ArrowLeft size={14} /> Back to Home
+            </button>
           </div>
 
         </header>
@@ -860,55 +992,6 @@ function App() {
         </div>
 
       </div>
-
-      {/* Developer Raw JSON API Log Console Modal */}
-      {showDebugConsole && (
-        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-950 border border-slate-800 rounded-3xl w-full max-w-2xl max-h-[80%] flex flex-col shadow-2xl overflow-hidden">
-            
-            {/* Console Header */}
-            <div className="flex justify-between items-center p-4 bg-slate-900/70 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                <span className="text-xs font-mono font-bold text-slate-200">Sarathi API Dev Console - Live Payloads</span>
-              </div>
-              <button
-                onClick={() => setShowDebugConsole(false)}
-                className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg transition-colors cursor-pointer"
-              >
-                Close Console
-              </button>
-            </div>
-
-            {/* Console Log Body */}
-            <div className="flex-1 p-5 overflow-y-auto space-y-4 font-mono text-[11px]">
-              
-              {/* Request log block */}
-              <div className="space-y-1">
-                <div className="text-emerald-400 font-bold uppercase tracking-wider text-[9px]">&gt; LAST OUTGOING REQUEST</div>
-                <div className="bg-slate-900/40 border border-slate-900 rounded-xl p-3.5 text-slate-300 whitespace-pre-wrap max-h-40 overflow-y-auto">
-                  {lastApiPayload ? JSON.stringify(lastApiPayload, null, 2) : "// No requests generated in this session yet."}
-                </div>
-              </div>
-
-              {/* Response log block */}
-              <div className="space-y-1">
-                <div className="text-indigo-400 font-bold uppercase tracking-wider text-[9px]">&gt; LAST INCOMING RESPONSE</div>
-                <div className="bg-slate-900/40 border border-slate-900 rounded-xl p-3.5 text-slate-300 whitespace-pre-wrap max-h-56 overflow-y-auto">
-                  {lastApiResponse ? JSON.stringify(lastApiResponse, null, 2) : "// Awaiting server transaction responses."}
-                </div>
-              </div>
-
-              {/* Context chunk retrieval indicator */}
-              <div className="text-slate-500 text-[10px] leading-relaxed italic border-t border-slate-900 pt-3">
-                * Note: The RAG engine translates user queries to English, matches against the multilingual-e5 Pinecone index (k=4 chunks), and forces a strict response Refusal fallback if context is missing.
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-      )}
       
     </div>
   );
