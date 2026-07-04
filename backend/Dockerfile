@@ -50,5 +50,5 @@ EXPOSE 8000
 # Switch to the non-privileged nonroot user
 USER nonroot
 
-# Run the API server directly using the virtual environment uvicorn binary
-ENTRYPOINT ["/opt/venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the API server via Python interpreter to bypass script wrapper shebang execution errors in distroless
+ENTRYPOINT ["/usr/bin/python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
