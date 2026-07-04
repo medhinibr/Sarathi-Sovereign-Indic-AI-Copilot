@@ -356,9 +356,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen w-screen bg-slate-100 flex items-center justify-center font-sans transition-colors duration-300 p-0 sm:p-4">
-      {/* Sleek Mobile-First Centered App Container */}
-      <div className="w-full h-screen sm:h-[820px] sm:max-w-[460px] sm:rounded-[36px] bg-slate-50 border border-slate-200/80 shadow-2xl flex flex-col overflow-hidden relative">
+    <div className={`min-h-screen w-full ${theme.bg} flex flex-col font-sans transition-colors duration-300`}>
+      {/* Spacious, modern centered container (max-w-5xl) */}
+      <div className="flex-1 w-full max-w-5xl mx-auto bg-white border-x border-slate-200/60 shadow-lg flex flex-col relative overflow-hidden min-h-0">
         
         {/* Sticky Top Navigation (Glassmorphism) */}
         <header className="h-16 border-b border-slate-200/60 px-4 flex items-center justify-between backdrop-blur-md bg-white/70 z-10 sticky top-0">
@@ -554,14 +554,14 @@ function App() {
         </div>
 
         {/* Dynamic Glowing Bottom Control Bar (Voice-First FAB) */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-50 via-slate-50/90 to-transparent flex flex-col items-center pointer-events-none z-30">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white/95 to-transparent flex flex-col items-center pointer-events-none z-30">
           {isRecording && (
             <span className="mb-2 text-[10px] font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100 shadow-sm animate-pulse">
               Recording... Tap Mic to Stop
             </span>
           )}
 
-          <div className="w-full max-w-sm flex flex-col items-center gap-2.5 pointer-events-auto">
+          <div className="w-full max-w-xl flex flex-col items-center gap-2.5 pointer-events-auto">
             
             {/* Huge Glowing Microphone Button */}
             <div className="relative">
@@ -608,7 +608,7 @@ function App() {
             <div className="absolute inset-0" onClick={() => setIsUploadModalOpen(false)}></div>
             
             {/* Modal Body */}
-            <div className="bg-white rounded-t-[32px] p-5 space-y-4 shadow-2xl relative z-10 max-h-[85%] overflow-y-auto transform transition-transform duration-300 border-t border-slate-100">
+            <div className="bg-white rounded-t-[32px] p-5 space-y-4 shadow-2xl relative z-10 max-h-[85%] overflow-y-auto transform transition-transform duration-300 border-t border-slate-100 max-w-xl mx-auto w-full">
               <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-2"></div>
               
               <div className="flex justify-between items-center">
