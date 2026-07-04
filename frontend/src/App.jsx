@@ -453,18 +453,34 @@ function App() {
                 </p>
               </div>
 
-              {/* Suggestion Chips */}
-              <div className="grid grid-cols-1 gap-2 pt-2 w-full max-w-[340px]">
-                {((mode === "education" ? shikshaSuggestions : arogyaSuggestions) || SUGGESTIONS[mode]).map((suggestion, idx) => (
+              {/* Suggestion Chips - Only visible after document upload */}
+              {uploadStatus === "success" ? (
+                <div className="grid grid-cols-1 gap-2 pt-2 w-full max-w-[340px]">
+                  {((mode === "education" ? shikshaSuggestions : arogyaSuggestions) || []).map((suggestion, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSendMessage(suggestion)}
+                      className={`text-left text-xs p-3.5 rounded-2xl border transition-all duration-300 ${theme.card} hover:shadow hover:border-slate-300 text-slate-700 font-medium`}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="pt-2">
                   <button
-                    key={idx}
-                    onClick={() => handleSendMessage(suggestion)}
-                    className={`text-left text-xs p-3.5 rounded-2xl border transition-all duration-300 ${theme.card} hover:shadow hover:border-slate-300 text-slate-700 font-medium`}
+                    onClick={() => setIsUploadModalOpen(true)}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold shadow-sm transition-all duration-300 border ${
+                      mode === "education"
+                        ? "bg-orange-50 border-orange-200 text-orange-600 hover:bg-orange-100"
+                        : "bg-teal-50 border-teal-200 text-teal-600 hover:bg-teal-100"
+                    }`}
                   >
-                    {suggestion}
+                    <Upload size={13} />
+                    Upload Document to Start
                   </button>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
           ) : (
             messages.map((msg) => (
