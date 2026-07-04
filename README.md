@@ -12,14 +12,6 @@ To explore the live production instance of the application, navigate to the foll
 
 ---
 
-## Live Application
-
-The production application is synced directly from the main branch on GitHub to Vercel, enabling automatic CI/CD deployment. The application features two view states:
-* Landing Page: A public marketing and architectural overview.
-* Chat Workspace: A workspace for uploading documents, selecting Indic languages, and engaging with the voice-first context-bound copilot.
-
----
-
 ## Screenshots
 
 The following sections illustrate the user interface design:
@@ -54,23 +46,46 @@ Sarathi implements a dual-view single-page application architecture backed by a 
 
 ## Features
 
-* Strict retrieval-augmented generation (RAG): Bypasses LLM internal knowledge to restrict responses strictly to the context of the uploaded document, eliminating hallucinations.
-* Dual domain-specific modes:
-  * Shiksha Mode: Promotes classroom-friendly instruction using localized analogies.
-  * Arogya Mode: Simplifies complex clinical documents without attempting self-diagnosis.
-* Voice-First accessibility: Integrates voice recording waves and live speech feedback for low-literacy users.
-* Dynamic theming: Automatically adjusts colors, buttons, and visual cues between Indian Sandalwood (Education) and Indigo/Teal (Healthcare) states.
-* Cross-lingual indexing: Translates regional language speech queries to English for precise vector search operations.
+### Strict Retrieval-Augmented Generation (RAG)
+The retrieval system retrieves top matching vector chunks from Pinecone. The system prompt enforces strict context constraints, preventing the LLM from utilizing its internal pre-trained weights if the answer is not explicitly found in the document. When context is unavailable, it returns a localized, pre-configured refusal message, ensuring zero hallucination.
+
+### Domain-Specific Environments
+* Shiksha Mode: Configured to support primary school teachers and students. Promotes pedagogical explanation using rural analogies, simple metaphors, and direct local dialect translations.
+* Arogya Mode: Designed for ASHA workers and community healthcare helpers. Translates complex medical scripts and lab reports into accessible explanations, while enforcing a safety guardrail that prohibits clinical self-diagnosis or drug prescriptions.
+
+### Voice-First Interface
+A prominent voice trigger control utilizing browser audio streams to capture user speech. Visual audio waves provide real-time recording feedback to assist low-literacy users.
+
+### Cross-Lingual Pipeline
+The system automatically translates regional speech inputs into English queries for database vector match, then translates the returned document context back into the target Indic script.
+
+### Dynamic Theming System
+State-driven colors adapt between Sandalwood orange (representing school heritage and focus) and deep Teal/Indigo (representing clinical calmness, safety, and health).
 
 ---
 
 ## Tech Stack
 
-* Frontend: React.js, Tailwind CSS, Lucide React, Vite.
-* Backend: FastAPI (Python 3.11), PyPDF, HTTPX.
-* LLM: LLaMA 3 via Groq Cloud SDK.
-* Vector DB: Pinecone Serverless (multilingual-e5-large index).
-* Speech APIs: Sarvam AI Saaras v3 (STT) and Bulbul v3 (TTS).
+### Frontend Architecture
+* React: Structured component-based layout management and persistent session state coordination.
+* Tailwind CSS: Responsive design layouts, custom keyframe audio wave animations, and themed styling.
+* Lucide React: Vector iconography system for clear interface cues.
+* Vite: Fast build tool and development server compiler.
+* Web Audio API: Browser audio stream ingestion.
+
+### Backend Infrastructure
+* FastAPI: Asynchronous, low-overhead REST framework optimized for serverless server deployments.
+* PyPDF: Serverless PDF text extractor and parser.
+* HTTPX: Asynchronous HTTP client for low-latency calls to external AI APIs.
+* Uvicorn: ASGI web server execution.
+
+### Machine Learning and Vectors
+* LLaMA 3: LLaMA 3 8B model hosted on Groq Cloud SDK (ChatGroq), achieving sub-second token latency.
+* Pinecone Serverless: Distributed cloud vector database hosting the multilingual-e5-large embeddings index for semantically matching queries.
+
+### Audio APIs
+* Sarvam Saaras v3: Multilingual speech-to-text REST API for transcribing Indic language voice inputs.
+* Sarvam Bulbul v3: Natural sounding text-to-speech engine for regional language voice synthesis.
 
 ---
 
