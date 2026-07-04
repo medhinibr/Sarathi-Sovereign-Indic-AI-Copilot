@@ -7,7 +7,7 @@ from pinecone import Pinecone
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_pinecone import PineconeVectorStore, PineconeEmbeddings
 from langchain_groq import ChatGroq
-from langchain.schema import Document
+from langchain_core.documents import Document
 
 # Load environmental variables from .env file
 load_dotenv()
