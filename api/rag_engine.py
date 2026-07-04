@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import pypdf
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_pinecone import PineconeVectorStore, PineconeEmbeddings
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langchain.schema import Document
 
 # Load environmental variables from .env file
@@ -13,10 +13,9 @@ load_dotenv()
 
 # Configuration variables
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "")
-PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "sarathi")
-LLM_API_KEY = os.getenv("LLM_API_KEY", "")
-LLM_API_BASE = os.getenv("LLM_API_BASE", "https://api.openai.com/v1")
-LLM_MODEL = os.getenv("LLM_MODEL", "gpt-3.5-turbo")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "sarathi-db")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+LLM_MODEL = os.getenv("LLM_MODEL", "llama3-8b-8192")
 
 # Initialize Pinecone embeddings model
 # multilingual-e5-large is a high-performance model hosted on Pinecone's serverless inference endpoints (Dimension 1024)
@@ -132,28 +131,24 @@ def get_system_prompt(mode: str, language: str) -> str:
 
 def query_rag_system(query: str, mode: str, language: str) -> str:
     """
-    Executes the retriever and generator loop using Pinecone and the compatible LLM client.
+    Executes the retriever and generator loop using Pinecone and ChatGroq.
     """
     if not vector_db:
         return "Vector database connection is uninitialized. Ensure PINECONE_API_KEY is configured."
+
+    if not GROQ_API_KEY:
+        return "Groq API Key is not configured. Please set the GROQ_API_KEY environment variable."
 
     # Retrieve relevant source chunks from the Pinecone vector database
     docs = vector_db.similarity_search(query, k=4)
     context_pieces = [doc.page_content for doc in docs]
     context = "\n---\n".join(context_pieces) if context_pieces else "No relevant document context found."
 
-    if not LLM_API_KEY:
-        return (
-            "LLM API Key is not configured. Please set the LLM_API_KEY environment variable. "
-            "Mocked Context Retrieved:\n" + context[:300] + "..."
-        )
-
     try:
-        # Initialize OpenAI or OpenAI-compatible client
-        llm = ChatOpenAI(
-            openai_api_key=LLM_API_KEY,
-            openai_api_base=LLM_API_BASE,
-            model_name=LLM_MODEL,
+        # Initialize LangChain ChatGroq wrapper for LLaMA inference
+        llm = ChatGroq(
+            groq_api_key=GROQ_API_KEY,
+            model=LLM_MODEL,
             temperature=0.3
         )
 
@@ -169,4 +164,4 @@ def query_rag_system(query: str, mode: str, language: str) -> str:
         return response.content
 
     except Exception as e:
-        return f"Error executing query through the LLM engine: {str(e)}"
+        return f"Error executing query through the Groq LLM engine: {str(e)}"

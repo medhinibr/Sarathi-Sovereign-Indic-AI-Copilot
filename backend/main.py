@@ -47,7 +47,7 @@ class TTSRequest(BaseModel):
     text: str
     language: str
 
-@app.post("/upload")
+@app.post("/api/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     """
     Endpoint to receive a PDF file and process it completely in-memory.
@@ -76,7 +76,7 @@ async def upload_pdf(file: UploadFile = File(...)):
         print(f"Error during in-memory PDF processing: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/chat")
+@app.post("/api/chat")
 async def chat_interaction(request: ChatRequest):
     """
     RAG-powered chat response endpoint.
@@ -96,7 +96,7 @@ async def chat_interaction(request: ChatRequest):
         print(f"Error during chat interaction: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/stt")
+@app.post("/api/stt")
 async def speech_to_text(file: UploadFile = File(...)):
     """
     Speech-to-Text translation endpoint using Sarvam AI's Saaras v3 REST API.
@@ -150,7 +150,7 @@ async def speech_to_text(file: UploadFile = File(...)):
         print(f"STT parsing error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to transcribe speech: {str(e)}")
 
-@app.post("/tts")
+@app.post("/api/tts")
 async def text_to_speech(request: TTSRequest):
     """
     Text-to-Speech synthesis endpoint using Sarvam AI's Bulbul v3 REST API.

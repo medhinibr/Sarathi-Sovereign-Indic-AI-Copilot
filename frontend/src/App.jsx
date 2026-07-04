@@ -15,8 +15,8 @@ import {
   Activity
 } from "lucide-react";
 
-// Determine API base URL dynamically based on environment
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// Determine API base URL dynamically based on environment configuration
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 // Supported Indic languages for target translation
 const LANGUAGES = [
@@ -26,7 +26,11 @@ const LANGUAGES = [
   { code: "Tamil", label: "தமிழ் (Tamil)" },
   { code: "Telugu", label: "తెలుగు (Telugu)" },
   { code: "Malayalam", label: "മലയാളം (Malayalam)" },
-  { code: "Marathi", label: "मराठी (Marathi)" }
+  { code: "Marathi", label: "मराठी (Marathi)" },
+  { code: "Gujarati", label: "ગુજરાતી (Gujarati)" },
+  { code: "Bengali", label: "বাংলা (Bengali)" },
+  { code: "Punjabi", label: "ਪੰਜਾਬੀ (Punjabi)" },
+  { code: "Odia", label: "ଓଡ଼ିଆ (Odia)" }
 ];
 
 // Context-aware suggestion prompts for quick testing
@@ -85,7 +89,7 @@ function App() {
     }
   };
 
-  // Upload PDF to FastAPIs /upload endpoint
+  // Upload PDF to FastAPI's /api/upload endpoint
   const handleUpload = async () => {
     if (!file) return;
 
@@ -96,7 +100,7 @@ function App() {
     formData.append("file", file);
 
     try {
-      const response = await fetch(`${API_URL}/upload`, {
+      const response = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
         body: formData,
       });
@@ -128,7 +132,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/chat`, {
+      const response = await fetch(`${API_URL}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -201,14 +205,14 @@ function App() {
     }
   };
 
-  // Sends recorded audio blob to backend /stt endpoint
+  // Sends recorded audio blob to backend /api/stt endpoint
   const handleAudioUpload = async (audioBlob) => {
     const formData = new FormData();
     formData.append("file", audioBlob, "recording.wav");
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/stt`, {
+      const response = await fetch(`${API_URL}/api/stt`, {
         method: "POST",
         body: formData,
       });
@@ -231,7 +235,7 @@ function App() {
   const playTextToSpeech = async (msgId, text) => {
     setPlayingMessageId(msgId);
     try {
-      const response = await fetch(`${API_URL}/tts`, {
+      const response = await fetch(`${API_URL}/api/tts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -286,7 +290,7 @@ function App() {
               }`}
             >
               <BookOpen size={14} />
-              Education
+              Education 🎓
             </button>
             <button
               onClick={() => setMode("healthcare")}
@@ -297,7 +301,7 @@ function App() {
               }`}
             >
               <Stethoscope size={14} />
-              Healthcare
+              Healthcare ⚕️
             </button>
           </div>
         </div>
@@ -444,7 +448,7 @@ function App() {
               <div>
                 <h3 className="text-base font-semibold text-white">Start a Conversation</h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Upload a PDF document on the sidebar first to index it in the local database. 
+                  Upload a PDF document on the sidebar first to index it in the cloud Pinecone database. 
                   Then, ask questions to get context-specific simplified translations.
                 </p>
               </div>

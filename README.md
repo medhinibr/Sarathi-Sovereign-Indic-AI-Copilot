@@ -1,199 +1,125 @@
 # Sarathi: Sovereign Indic AI Copilot
 
-Sarathi is a production-grade sovereign AI copilot proof-of-concept focusing on Indian languages, Education, and Healthcare. It features a dual-mode interaction framework that acts as a government school teacher for textbook explanation (Education Mode) or an empathetic clinical assistant for document simplification (Healthcare Mode).
+Sarathi is a production-grade, serverless-ready sovereign AI copilot proof-of-concept designed for Indian languages, Education, and Healthcare. It features a dual-mode interaction framework that acts as a government school teacher for textbook explanation (Education Mode) or an empathetic clinical assistant for simplifying document terminology (Healthcare Mode).
 
-The application integrates retrieval-augmented generation (RAG) using a local vector database, speech-to-text, text-to-speech placeholders, and a modern React interface.
+This repository is optimized for serverless deployment on Vercel, utilizing cloud vector index hosting and direct third-party AI APIs to remain completely within serverless memory and disk execution limits.
 
 ---
 
 ## Technical Stack
 
 ### Frontend
-* React.js (Vite build toolchain)
-* Tailwind CSS (Utility-first styling)
-* Lucide React (Icon assets)
+* React.js (Vite Build Toolchain)
+* Tailwind CSS (Utility-first design system)
+* Lucide React (Icon sets)
+* HTML5 Media Capture API (In-browser audio recording)
 
-### Backend
-* Python 3.10
-* FastAPI (Asynchronous web frame)
-* PyPDF (PDF text extraction)
+### Backend (Serverless & Docker)
+* Python 3.11
+* FastAPI (Asynchronous framework)
+* PyPDF (In-memory PDF text extraction)
 * Uvicorn (ASGI server implementation)
+* HTTPX (Asynchronous HTTP client for voice API calls)
 
 ### AI and RAG Orchestration
-* LangChain (LLM and retriever chains)
-* ChromaDB (Local persistent vector database)
-* Sentence-Transformers (Local embedding model: all-MiniLM-L6-v2)
-* LangChain-OpenAI (Compatible client for Groq / OpenAI LLM APIs)
+* LangChain (LLM wrappers, document splitting, and retriever orchestration)
+* Pinecone Serverless (Cloud vector database hosting)
+* Pinecone Embeddings (multilingual-e5-large model via Pinecone serverless inference)
+* ChatGroq (High-performance inference engine for LLaMA 3 models)
 
 ### DevOps and Deployment
-* Docker (Containerization engine)
+* Vercel (Serverless host environment for SPA and API routes)
+* Docker (Containerization engine for local validation)
 * Docker Compose (Multi-container orchestration)
 
 ---
 
-## Repository Structure
+## Project Structure
 
 ```
+├── api/
+│   ├── index.py            # Vercel Serverless FastAPI entrypoint
+│   └── rag_engine.py       # Pinecone and ChatGroq orchestration
 ├── backend/
-│   ├── chroma_db/          # Persistent Chroma DB storage (Git ignored)
-│   ├── temp_uploads/       # Temporary folder for PDF processing (Git ignored)
-│   ├── Dockerfile          # Python backend build instructions
-│   ├── main.py             # FastAPI router, models, and endpoints
-│   ├── rag_engine.py       # Text extraction, chunking, retrieval and prompts
-│   ├── requirements.txt    # Python library dependencies
-│   └── .env.example        # Reference environment variables
+│   ├── Dockerfile          # Multi-stage distroless build file for backend container
+│   ├── main.py             # FastAPI local development entrypoint
+│   ├── rag_engine.py       # Local copy of RAG module
+│   ├── requirements.txt    # Python library requirements for local development
+│   └── .env.example        # Environment template file
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx         # Main application UI and logic
-│   │   ├── index.css       # Tailwind entry and custom styling
-│   │   └── main.jsx        # React root registration
-│   ├── Dockerfile          # Node.js frontend build instructions
-│   ├── index.html          # Web page entry template
-│   ├── package.json        # Frontend project dependencies
-│   ├── postcss.config.js   # PostCSS configuration
-│   ├── tailwind.config.js  # Tailwind custom styles and colors
+│   │   ├── App.jsx         # Modern Tailwind React workspace
+│   │   ├── index.css       # Tailwind setup and styles
+│   │   └── main.jsx        # React DOM mount point
+│   ├── Dockerfile          # Frontend container configuration
+│   ├── package.json        # Node dependency manifest
+│   ├── tailwind.config.js  # Color palette and themes
 │   └── vite.config.js      # Vite compilation parameters
-├── docker-compose.yml      # Multi-service build and run configurations
-└── .gitignore              # Files excluded from git version control
+├── docker-compose.yml      # Local orchestration config
+├── vercel.json             # Vercel serverless routing config
+├── requirements.txt        # Root-level python dependencies for Vercel builds
+└── .gitignore              # Files ignored by git
 ```
 
 ---
 
-## Mode Persona and Prompt Design
+## Architecture and Design Decisions
 
-The core of Sarathi's utility is governed by strict Prompt Engineering settings configured in `backend/rag_engine.py`:
+### 1. Zero-Disk In-Memory Processing
+Vercel's serverless environment operates with a read-only filesystem. To support file ingestion, the upload API receives PDF documents as multipart file uploads, reads them directly into RAM as bytes, processes them via in-memory ByteIO streams, and extracts text without creating temporary local files.
 
-### 1. Education Mode
-Instructs the LLM to behave like a helpful, encouraging Indian government school teacher. It uses simple analogies, localized examples (village life, farming, simple household activities), and breaks down textbook topics step-by-step.
+### 2. Cloud Vector Database and Inference
+Local vector stores (such as ChromaDB) require local database writes, and local embedding models (such as SentenceTransformers) load large weights into memory, violating Vercel's 250MB deployment size limit. Sarathi uses Pinecone Serverless to host the vector index in the cloud, utilizing Pinecone's managed multilingual-e5-large inference model for vector embeddings.
 
-### 2. Healthcare Mode
-Instructs the LLM to act as a warm, reassuring clinical navigator. It translates medical terminology into layman's terms. Importantly, it enforces safety rules: it must never diagnose, prescribe, or recommend specific drugs, and must direct patients to real doctors for diagnostic decisions.
+### 3. Integrated Voice Capabilities
+* Speech-to-Text (STT): Direct integration with Sarvam AI's Saaras v3 REST API transcribes audio captured from the user's microphone.
+* Text-to-Speech (TTS): Direct integration with Sarvam AI's Bulbul v3 REST API maps output languages to BCP-47 codes, generates spoken responses, and streams binary audio back to the client.
 
-### 3. Multi-lingual Synthesis
-Instructs the model to output responses entirely in the selected Indic language (such as Kannada, Hindi, Tamil, Telugu, Malayalam, Marathi) using the correct native script.
-
----
-
-## API Endpoints Walkthrough
-
-* **POST /upload**: Receives an uploaded PDF file, saves it to a secure temporary path, extracts raw text, breaks text into 1,000-character chunks with a 200-character overlap, inserts embeddings into ChromaDB, and deletes the temporary file.
-* **POST /chat**: Accepts a JSON payload containing the user's message, current mode (Education/Healthcare), and output language. It queries ChromaDB to retrieve matching context and passes it along with the mode-specific system instructions to the LLM.
-* **POST /stt**: Accepts an audio file upload and returns transcribed text. Currently configured as a mock endpoint, it receives the media stream directly from the browser's mic recording.
-* **POST /tts**: Accepts text and language parameters. It dynamically compiles a 1-second WAV audio file containing a 440Hz sine wave and returns a binary audio stream. The React frontend reads this response directly and plays it in the browser.
+### 4. Strict Dual-Persona Prompt Enforcement
+Prompt configurations in the RAG engine enforce distinct personas:
+* Education Mode: Models the behavior of a government school teacher in India using analogies and local examples.
+* Healthcare Mode: Models the behavior of an empathetic assistant, explaining medical jargon in simple terms. It includes safety checks to prevent medical diagnosis and directs users to qualified professionals.
+* Script Alignment: Outputs translation text directly using the correct Indic script of the language (such as Devanagari for Hindi, Kannada script for Kannada, etc.).
 
 ---
 
-## Local Setup and Installation
+## Environment Variables Configuration
 
-Follow either of the two installation methods below.
+To run the application, the following environment variables must be configured in your environment or in a local .env file (placed in the backend directory):
 
-### Method 1: Using Docker Compose (Recommended)
+```env
+# Database Credentials
+PINECONE_API_KEY=your_pinecone_api_key_here
+PINECONE_INDEX_NAME=sarathi-db
 
-This method packages the entire stack and runs both services in container isolation.
+# Groq LLM Settings
+GROQ_API_KEY=your_groq_api_key_here
+LLM_MODEL=llama3-8b-8192
 
-1. Clone or navigate to the repository directory:
-   ```bash
-   cd "Sarathi Sovereign Indic AI Copilot"
-   ```
+# Sarvam Voice API Key
+SARVAM_API_KEY=your_sarvam_api_key_here
+```
 
-2. Create the environment file:
-   Copy the example file to a live `.env` file inside the `backend` folder:
+On Vercel, navigate to Project Settings -> Environment Variables and add the above keys.
+
+---
+
+## Local Setup and Running
+
+### Running via Docker Compose
+
+Docker Compose runs the entire stack in isolated container environments.
+
+1. Ensure Docker and Docker Desktop are running on your system.
+2. Initialize the environment configuration:
    ```bash
    cp backend/.env.example backend/.env
    ```
-
-3. Configure LLM credentials:
-   Open the newly created `backend/.env` file and insert your API credentials (either Groq or OpenAI):
-   ```env
-   LLM_API_KEY=your_actual_api_key_here
-   LLM_API_BASE=https://api.groq.com/openai/v1
-   LLM_MODEL=llama3-8b-8192
-   ```
-
-4. Build and start the services:
+3. Update the newly created backend/.env with your actual API keys.
+4. Run the build and launch command:
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
-
 5. Access the applications:
-   * Frontend Application: http://localhost:5173
-   * FastAPI API Documentation: http://localhost:8000/docs
-
----
-
-### Method 2: Manual Installation (Without Docker)
-
-If you prefer to run the services directly on your host machine:
-
-#### 1. Setup Backend
-1. Move to the backend folder:
-   ```bash
-   cd backend
-   ```
-2. Create and activate a Python virtual environment:
-   ```bash
-   python -m venv venv
-   # On Windows:
-   venv\Scripts\activate
-   # On macOS/Linux:
-   source venv/bin/activate
-   ```
-3. Install the dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Copy the environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-5. Configure `backend/.env` with your API keys.
-6. Run the FastAPI development server:
-   ```bash
-   python main.py
-   ```
-   The backend server will run on http://localhost:8000.
-
-#### 2. Setup Frontend
-1. Open a new terminal and move to the frontend folder:
-   ```bash
-   cd frontend
-   ```
-2. Install Node modules:
-   ```bash
-   npm install
-   ```
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-   The frontend app will launch on http://localhost:5173.
-
----
-
-## Voice API Integration Guide
-
-To swap the placeholder endpoints for production-grade APIs (such as Sarvam AI's Indic audio models):
-
-### Speech-to-Text (STT) Integration
-In `backend/main.py` under the `/stt` route:
-1. Capture the uploaded audio file bytes.
-2. Send a POST request to the Sarvam Speech-to-Text translation API:
-   ```python
-   headers = {"api-subscription-key": "your_sarvam_api_key"}
-   files = {"file": (file.filename, file.file.read(), file.content_type)}
-   # Call Sarvam translation endpoints
-   ```
-3. Extract the transcribed string from the response and return it in the JSON body.
-
-### Text-to-Speech (TTS) Integration
-In `backend/main.py` under the `/tts` route:
-1. Capture the synthesized LLM text and chosen Indic language.
-2. Request audio synthesis from the Sarvam Text-to-Speech API:
-   ```python
-   payload = {
-       "inputs": [text],
-       "target_language_code": "kn-IN", # Translate language string to code (e.g. kn-IN, hi-IN)
-       "speaker": "meera"
-   }
-   ```
-3. Stream the raw output audio bytes back to the client as a binary file.
+   * Web Frontend: http://localhost:5173
+   * API Documentation: http://localhost:8000/docs
