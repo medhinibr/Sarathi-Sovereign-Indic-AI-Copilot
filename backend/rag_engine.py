@@ -3,6 +3,7 @@ import io
 from typing import List
 from dotenv import load_dotenv
 import pypdf
+from pinecone import Pinecone
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_pinecone import PineconeVectorStore, PineconeEmbeddings
 from langchain_groq import ChatGroq
@@ -14,6 +15,7 @@ load_dotenv()
 # Configuration variables retrieved dynamically
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "sarathi-db")
+PINECONE_INDEX_HOST = os.getenv("PINECONE_INDEX_HOST", "https://sarathi-db-szh18us.svc.aped-4627-b74a.pinecone.io")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "llama3-8b-8192")
 
@@ -25,9 +27,13 @@ if PINECONE_API_KEY:
         pinecone_api_key=PINECONE_API_KEY
     )
     
+    # Connect directly to index using the provided index host URL to prevent permission/index-listing failures
+    pc = Pinecone(api_key=PINECONE_API_KEY)
+    index = pc.Index(name=PINECONE_INDEX_NAME, host=PINECONE_INDEX_HOST)
+    
     # Initialize connection to Pinecone serverless vector database
     vector_db = PineconeVectorStore(
-        index_name=PINECONE_INDEX_NAME,
+        index=index,
         embedding=embeddings,
         pinecone_api_key=PINECONE_API_KEY
     )
