@@ -1,6 +1,7 @@
 import os
 import io
 import base64
+import sys
 import httpx
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,11 +9,13 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional
 
+# Ensure that modules in the same directory (api/) are importable in serverless execution environments
+sys.path.append(os.path.dirname(__file__))
 from rag_engine import ingest_pdf_bytes, query_rag_system
 
 app = FastAPI(
-    title="Sarathi Sovereign Indic AI Copilot Backend",
-    description="FastAPI Backend updated for serverless architecture with Pinecone embeddings and real Sarvam AI voice endpoints."
+    title="Sarathi Sovereign Indic AI Copilot - Vercel Serverless Backend",
+    description="Serverless-ready FastAPI wrapper for routing API endpoints to Pinecone DB and Sarvam Voice Engines."
 )
 
 app.add_middleware(
@@ -23,7 +26,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Standard mapping dictionary for translating Indic languages to their respective BCP-47 codes supported by Sarvam AI
 LANGUAGE_CODE_MAP = {
     "English": "en-IN",
     "Kannada": "kn-IN",
@@ -47,7 +49,14 @@ class TTSRequest(BaseModel):
     text: str
     language: str
 
-@app.post("/upload")
+@app.get("/api/health")
+async def health_check():
+    """
+    Utility check route for serverless health validation.
+    """
+    return {"status": "healthy", "service": "sarathi-indic-copilot"}
+
+@app.post("/api/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     """
     Endpoint to receive a PDF file and process it completely in-memory.
@@ -76,7 +85,7 @@ async def upload_pdf(file: UploadFile = File(...)):
         print(f"Error during in-memory PDF processing: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/chat")
+@app.post("/api/chat")
 async def chat_interaction(request: ChatRequest):
     """
     RAG-powered chat response endpoint.
@@ -96,7 +105,7 @@ async def chat_interaction(request: ChatRequest):
         print(f"Error during chat interaction: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/stt")
+@app.post("/api/stt")
 async def speech_to_text(file: UploadFile = File(...)):
     """
     Speech-to-Text translation endpoint using Sarvam AI's Saaras v3 REST API.
@@ -150,7 +159,7 @@ async def speech_to_text(file: UploadFile = File(...)):
         print(f"STT parsing error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to transcribe speech: {str(e)}")
 
-@app.post("/tts")
+@app.post("/api/tts")
 async def text_to_speech(request: TTSRequest):
     """
     Text-to-Speech synthesis endpoint using Sarvam AI's Bulbul v3 REST API.
@@ -213,7 +222,3 @@ async def text_to_speech(request: TTSRequest):
     except Exception as e:
         print(f"TTS compilation error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to synthesize speech: {str(e)}")
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
