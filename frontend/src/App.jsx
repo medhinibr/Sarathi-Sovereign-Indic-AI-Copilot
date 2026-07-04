@@ -72,7 +72,6 @@ function App() {
   const [uploadError, setUploadError] = useState("");
   const [shikshaSuggestions, setShikshaSuggestions] = useState(null);
   const [arogyaSuggestions, setArogyaSuggestions] = useState(null);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   // Voice interaction states
   const [isRecording, setIsRecording] = useState(false);
@@ -345,33 +344,152 @@ function App() {
 
   // Define dynamic themes based on selected mode
   const theme = {
-    bg: mode === "education" ? "bg-orange-50/20" : "bg-teal-50/20",
-    text: "text-slate-900",
+    bg: mode === "education" ? "bg-orange-50" : "bg-teal-50",
+    text: mode === "education" ? "text-orange-950" : "text-teal-950",
+    sidebar: mode === "education" ? "bg-orange-100/60 border-orange-200" : "bg-teal-100/60 border-teal-200",
     primary: mode === "education" ? "bg-orange-500 hover:bg-orange-600 text-white" : "bg-teal-600 hover:bg-teal-700 text-white",
-    card: mode === "education" ? "bg-white border-orange-100" : "bg-white border-teal-100",
-    fab: mode === "education" ? "bg-orange-500 hover:bg-orange-600 text-white ring-orange-200" : "bg-teal-600 hover:bg-teal-700 text-white ring-teal-200",
-    bubbleUser: "bg-slate-950 text-slate-50 rounded-3xl rounded-tr-md px-4 py-2.5 text-base font-medium shadow-sm border border-slate-900/5",
-    bubbleBot: mode === "education" ? "bg-orange-50/30 border border-orange-100/70 text-orange-950 rounded-3xl rounded-tl-md px-4 py-3 text-base shadow-sm" : "bg-teal-50/30 border border-teal-100/70 text-teal-950 rounded-3xl rounded-tl-md px-4 py-3 text-base shadow-sm",
+    card: mode === "education" ? "bg-white border-orange-200" : "bg-white border-teal-200",
+    fab: mode === "education" ? "bg-orange-500 hover:bg-orange-600 text-white ring-orange-300" : "bg-teal-600 hover:bg-teal-700 text-white ring-teal-300",
+    bubbleUser: "bg-indigo-600 text-white border-indigo-700",
+    bubbleBot: mode === "education" ? "bg-white border-orange-200 text-orange-950" : "bg-white border-teal-200 text-teal-950",
+    inputBg: "bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500",
     logoColor: mode === "education" ? "text-orange-600" : "text-teal-600"
   };
 
   return (
-    <div className={`min-h-screen w-full ${theme.bg} flex flex-col font-sans transition-colors duration-300`}>
-      {/* Spacious, modern centered container (max-w-5xl) */}
-      <div className="flex-1 w-full max-w-5xl mx-auto bg-white border-x border-slate-200/60 shadow-lg flex flex-col relative overflow-hidden min-h-0">
+    <div className={`flex h-screen w-screen overflow-hidden ${theme.bg} ${theme.text} font-sans transition-colors duration-300`}>
+      
+      {/* Sidebar - Control & File Upload Panel */}
+      <div className={`w-80 flex flex-col border-r ${theme.sidebar} p-6 space-y-6 transition-all duration-300`}>
         
-        {/* Sticky Top Navigation (Glassmorphism) */}
-        <header className="h-16 border-b border-slate-200/60 px-4 flex items-center justify-between backdrop-blur-md bg-white/70 z-10 sticky top-0">
-          {/* Logo */}
-          <div className="flex items-center gap-1">
-            <span className={`text-base font-bold tracking-tight ${theme.logoColor}`}>Sarathi</span>
-          </div>
+        {/* Logo and branding */}
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <span className={`${theme.logoColor}`}>Sarathi</span>
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5 font-medium uppercase tracking-wider">Sovereign Indic AI Copilot</p>
+        </div>
 
+        {/* PDF Document Ingestion Container */}
+        <div className="flex-1 flex flex-col min-h-0 space-y-2">
+          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Knowledge Base PDF</label>
+          <div className={`flex-1 border border-dashed border-slate-300 rounded-2xl p-4 flex flex-col justify-between ${theme.card} shadow-sm`}>
+            
+            {uploadStatus === "success" ? (
+              /* Success/Active Document View */
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-4 space-y-4">
+                <div className={`p-4 rounded-3xl ${
+                  mode === "education" ? "bg-orange-50 text-orange-600 border border-orange-200" : "bg-teal-50 text-teal-600 border border-teal-200"
+                } shadow-sm`}>
+                  <FileText size={48} />
+                </div>
+                
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-slate-800 break-all max-w-[200px]">
+                    {uploadedFilename}
+                  </h4>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Active Library Document
+                  </span>
+                </div>
+
+                 <button 
+                  onClick={() => {
+                    setFile(null);
+                    setUploadStatus("idle");
+                    setUploadedFilename("");
+                    if (mode === "education") {
+                      setShikshaSuggestions(null);
+                    } else {
+                      setArogyaSuggestions(null);
+                    }
+                  }}
+                  className="text-xs font-semibold text-rose-600 hover:text-rose-700 underline underline-offset-4 cursor-pointer pt-2"
+                >
+                  Remove & Upload New
+                </button>
+              </div>
+            ) : (
+              /* Normal Upload Area */
+              <>
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept=".pdf"
+                    className="hidden"
+                  />
+                  
+                  <Upload 
+                    size={32} 
+                    className={`mb-3 ${
+                      mode === "education" ? "text-orange-400" : "text-teal-500"
+                    }`} 
+                  />
+                  
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 underline underline-offset-4 cursor-pointer"
+                  >
+                    Choose PDF file
+                  </button>
+                  
+                  {file ? (
+                    <span className="text-xs text-slate-700 mt-2 font-medium truncate max-w-[200px]">
+                      {file.name}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      Upload textbook chapters or clinical documents
+                    </span>
+                  )}
+                </div>
+
+                {/* Upload Controls and Status Messaging */}
+                <div className="pt-4 border-t border-slate-100 space-y-3">
+                  {file && (
+                    <button
+                      onClick={handleUpload}
+                      disabled={uploadStatus === "uploading"}
+                      className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${theme.primary} disabled:opacity-50 flex items-center justify-center gap-1.5`}
+                    >
+                      {uploadStatus === "uploading" && <Loader2 size={14} className="animate-spin" />}
+                      Ingest Document
+                    </button>
+                  )}
+
+                  {/* Error Notification */}
+                  {uploadStatus === "error" && (
+                    <div className="flex items-start gap-2 text-rose-800 bg-rose-50 p-3 rounded-xl border border-rose-200">
+                      <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600" />
+                      <div className="text-xs leading-tight">
+                        <p className="font-bold">Ingestion Failed</p>
+                        <p className="text-slate-500 mt-0.5">{uploadError}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+            
+          </div>
+        </div>
+
+      </div>
+
+      {/* Main Chat Workspace */}
+      <div className="flex-1 flex flex-col bg-transparent relative">
+        
+        {/* Dynamic Mode Header with Glassmorphism */}
+        <header className="h-16 border-b border-slate-200/60 px-8 flex items-center justify-between backdrop-blur-md bg-white/70 z-10 sticky top-0">
+          
           {/* Mode Toggle Selector */}
-          <div className="flex items-center gap-0.5 p-0.5 bg-slate-100 rounded-full border border-slate-200/60 shadow-inner">
+          <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-full border border-slate-200 shadow-inner">
             <button
               onClick={() => setMode("education")}
-              className={`flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-full transition-all duration-300 ${
+              className={`flex items-center justify-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-300 ${
                 mode === "education"
                   ? "bg-orange-500 text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
@@ -381,7 +499,7 @@ function App() {
             </button>
             <button
               onClick={() => setMode("healthcare")}
-              className={`flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-full transition-all duration-300 ${
+              className={`flex items-center justify-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-300 ${
                 mode === "healthcare"
                   ? "bg-teal-600 text-white shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
@@ -391,61 +509,43 @@ function App() {
             </button>
           </div>
 
-          {/* Action Tools */}
-          <div className="flex items-center gap-1.5">
-            {/* Globe selector */}
-            <div className="relative">
-              <Globe size={13} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="bg-slate-100 hover:bg-slate-200 border-0 rounded-full py-1 pl-6 pr-2.5 text-[10px] font-bold text-slate-700 focus:outline-none transition-colors cursor-pointer appearance-none"
-              >
-                {LANGUAGES.map((lang) => (
-                  <option key={lang.code} value={lang.code}>
-                    {lang.code}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Ingestion Trigger Button */}
-            <button
-              onClick={() => setIsUploadModalOpen(true)}
-              className={`p-1.5 rounded-full border hover:bg-slate-50 transition-colors relative ${
-                uploadStatus === "success" 
-                  ? (mode === "education" ? "border-orange-200 text-orange-600 bg-orange-50" : "border-teal-200 text-teal-600 bg-teal-50") 
-                  : "border-slate-200 text-slate-500"
-              }`}
-              title="Knowledge Base / PDF"
+          {/* Language Selector Dropdown */}
+          <div className="flex items-center gap-2">
+            <Globe size={16} className="text-slate-400" />
+            <select
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+              className="bg-white border border-slate-200 rounded-full py-1.5 px-3 text-xs font-semibold text-slate-700 focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
             >
-              <FileText size={15} />
-              {uploadStatus === "success" && (
-                <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white animate-pulse"></span>
-              )}
-            </button>
+              {LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.label}
+                </option>
+              ))}
+            </select>
           </div>
+
         </header>
 
         {/* Message Feed Area */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 pb-48">
+        <div className="flex-1 overflow-y-auto p-8 space-y-6 pb-36">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center space-y-5 px-2 py-4">
-              <div className={`p-4 rounded-3xl bg-white border shadow-sm ${
-                mode === "education" ? "border-orange-100 text-orange-500" : "border-teal-100 text-teal-500"
+            <div className="h-full flex flex-col items-center justify-center max-w-lg mx-auto text-center space-y-6">
+              <div className={`p-5 rounded-3xl bg-white border shadow-sm ${
+                mode === "education" ? "border-orange-200 text-orange-500" : "border-teal-200 text-teal-500"
               }`}>
                 {mode === "education" ? (
-                  <HelpCircle size={32} />
+                  <HelpCircle size={40} />
                 ) : (
-                  <Activity size={32} />
+                  <Activity size={40} />
                 )}
               </div>
               
               <div>
-                <h3 className="text-xl font-bold tracking-tight text-slate-800">
+                <h3 className="text-2xl font-semibold tracking-tight text-slate-800">
                   {mode === "education" ? "Shiksha AI Classroom Helper" : "Arogya Health Companion"}
                 </h3>
-                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed max-w-[280px] mx-auto">
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
                   {mode === "education" 
                     ? "Welcome to Shiksha Mode. Upload your textbook or lesson plan and start learning. Use voice input for quick questions."
                     : "Welcome to Arogya Mode. Upload your clinical diagnosis or report, and we will simplify it for you. Voice-first and non-diagnostic."
@@ -453,99 +553,90 @@ function App() {
                 </p>
               </div>
 
-              {/* Suggestion Chips - Only visible after document upload */}
-              {uploadStatus === "success" ? (
-                <div className="grid grid-cols-1 gap-2 pt-2 w-full max-w-[340px]">
-                  {((mode === "education" ? shikshaSuggestions : arogyaSuggestions) || []).map((suggestion, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSendMessage(suggestion)}
-                      className={`text-left text-xs p-3.5 rounded-2xl border transition-all duration-300 ${theme.card} hover:shadow hover:border-slate-300 text-slate-700 font-medium`}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="pt-2">
+              {/* Suggestion Chips */}
+              <div className="grid grid-cols-1 gap-2 pt-2 w-full">
+                {((mode === "education" ? shikshaSuggestions : arogyaSuggestions) || SUGGESTIONS[mode]).map((suggestion, idx) => (
                   <button
-                    onClick={() => setIsUploadModalOpen(true)}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold shadow-sm transition-all duration-300 border ${
-                      mode === "education"
-                        ? "bg-orange-50 border-orange-200 text-orange-600 hover:bg-orange-100"
-                        : "bg-teal-50 border-teal-200 text-teal-600 hover:bg-teal-100"
-                    }`}
+                    key={idx}
+                    onClick={() => handleSendMessage(suggestion)}
+                    className={`text-left text-sm p-4 rounded-2xl border transition-all duration-300 ${theme.card} hover:shadow-md hover:border-slate-300 text-slate-700 font-medium`}
                   >
-                    <Upload size={13} />
-                    Upload Document to Start
+                    {suggestion}
                   </button>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           ) : (
             messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex gap-2.5 ${
+                className={`flex gap-4 ${
                   msg.sender === "user" ? "justify-end" : "justify-start"
                 }`}
               >
                 {/* Agent Avatar */}
                 {msg.sender !== "user" && (
-                  <div className={`h-8 w-8 rounded-xl shrink-0 flex items-center justify-center border shadow-sm ${
+                  <div className={`h-10 w-10 rounded-2xl shrink-0 flex items-center justify-center border shadow-sm ${
                     mode === "education" 
                       ? "bg-orange-100 border-orange-200 text-orange-600" 
                       : "bg-teal-100 border-teal-200 text-teal-600"
                   }`}>
-                    {mode === "education" ? <BookOpen size={14} /> : <Stethoscope size={14} />}
+                    {mode === "education" ? <BookOpen size={18} /> : <Stethoscope size={18} />}
                   </div>
                 )}
 
                 {/* Message Bubble */}
-                <div className={`max-w-[78%] border p-3.5 shadow-sm ${
+                <div className={`max-w-xl rounded-2xl p-4 text-lg leading-relaxed border shadow-sm ${
                   msg.sender === "user"
                     ? theme.bubbleUser
                     : msg.sender === "system"
-                    ? "bg-rose-50 border-rose-200 text-rose-950 rounded-3xl rounded-tl-md"
+                    ? "bg-rose-50 border-rose-200 text-rose-950"
                     : theme.bubbleBot
                 }`}>
-                  <p className="whitespace-pre-line leading-relaxed text-sm">{msg.text}</p>
+                  <p className="whitespace-pre-line">{msg.text}</p>
                   
-                  {/* TTS Audio Trigger */}
+                  {/* TTS Trigger Control for Assistant responses */}
                   {msg.sender === "assistant" && (
-                    <div className={`mt-2.5 pt-2 border-t flex items-center justify-between ${
+                    <div className={`mt-3 pt-3 border-t flex items-center justify-between ${
                       mode === "education" ? "border-orange-100" : "border-teal-100"
                     }`}>
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Audio Playback</span>
+                      <span className="text-xs text-slate-400 font-medium">Listen to response</span>
                       <button
                         onClick={() => playTextToSpeech(msg.id, msg.text)}
                         disabled={playingMessageId !== null}
-                        className={`p-1.5 rounded-lg transition-colors hover:bg-slate-100 ${
+                        className={`p-2 rounded-xl transition-colors hover:bg-slate-100 ${
                           playingMessageId === msg.id 
                             ? "text-indigo-600 animate-pulse" 
                             : "text-slate-500 hover:text-slate-700"
                         }`}
                       >
-                        <Volume2 size={13} />
+                        <Volume2 size={16} />
                       </button>
                     </div>
                   )}
                 </div>
+
+                {/* User Avatar */}
+                {msg.sender === "user" && (
+                  <div className="h-10 w-10 rounded-2xl shrink-0 flex items-center justify-center bg-indigo-100 border border-indigo-200 text-indigo-600 shadow-sm">
+                    <FileText size={18} />
+                  </div>
+                )}
               </div>
             ))
           )}
           
           {/* Loading Indicator */}
           {isLoading && (
-            <div className="flex gap-2.5 justify-start">
-              <div className={`h-8 w-8 rounded-xl shrink-0 flex items-center justify-center border animate-pulse ${
+            <div className="flex gap-4 justify-start">
+              <div className={`h-10 w-10 rounded-2xl shrink-0 flex items-center justify-center border animate-pulse ${
                 mode === "education" ? "bg-orange-100 border-orange-200 text-orange-600" : "bg-teal-100 border-teal-200 text-teal-600"
               }`}>
-                {mode === "education" ? <BookOpen size={14} /> : <Stethoscope size={14} />}
+                {mode === "education" ? <BookOpen size={18} /> : <Stethoscope size={18} />}
               </div>
-              <div className={`rounded-3xl rounded-tl-md p-3.5 flex items-center gap-2 border shadow-sm ${theme.card}`}>
-                <Loader2 size={14} className="animate-spin text-slate-400" />
-                <span className="text-xs text-slate-500">Formulating response...</span>
+              <div className={`rounded-2xl p-4 flex items-center gap-3 border shadow-sm ${theme.card}`}>
+                <Loader2 size={18} className="animate-spin text-slate-400" />
+                <span className="text-sm text-slate-500">Synthesizing translations...</span>
               </div>
             </div>
           )}
@@ -553,170 +644,60 @@ function App() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Dynamic Glowing Bottom Control Bar (Voice-First FAB) */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white/95 to-transparent flex flex-col items-center pointer-events-none z-30">
-          {isRecording && (
-            <span className="mb-2 text-[10px] font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100 shadow-sm animate-pulse">
-              Recording... Tap Mic to Stop
-            </span>
-          )}
-
-          <div className="w-full max-w-xl flex flex-col items-center gap-2.5 pointer-events-auto">
+        {/* Massive Voice-First Mic FAB and Input Controls */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50/90 via-slate-50/50 to-transparent flex flex-col items-center pointer-events-none">
+          <div className="w-full max-w-2xl flex items-center gap-3 pointer-events-auto">
             
-            {/* Huge Glowing Microphone Button */}
-            <div className="relative">
-              <button
-                onClick={isRecording ? stopAudioRecording : startAudioRecording}
-                className={`h-16 w-16 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 focus:outline-none ring-4 ${theme.fab} ${
-                  isRecording 
-                    ? "scale-110 ring-rose-200/90 shadow-[0_0_20px_rgba(244,63,94,0.4)] animate-pulse" 
-                    : mode === "education"
-                      ? "hover:scale-105 ring-orange-100/80 shadow-[0_0_15px_rgba(249,115,22,0.25)]"
-                      : "hover:scale-105 ring-teal-100/80 shadow-[0_0_15px_rgba(13,148,136,0.25)]"
-                }`}
-              >
-                {isRecording ? <MicOff size={24} className="text-white" /> : <Mic size={24} className="text-white" />}
-              </button>
-            </div>
-
-            {/* Pill text field input */}
-            <div className="w-full flex items-center bg-white border border-slate-200 rounded-full shadow p-1 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all duration-300">
+            {/* Input field wrapper */}
+            <div className="flex-1 flex items-center bg-white border border-slate-200 rounded-2xl shadow-md p-1.5 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all duration-300">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder={isRecording ? "Transcribing speech..." : "Type or speak..."}
-                className="flex-1 bg-transparent border-0 outline-none px-4 py-2 text-xs text-slate-800 placeholder-slate-400"
+                placeholder={
+                  isRecording 
+                    ? "Listening..." 
+                    : `Type or click mic to talk...`
+                }
+                disabled={false}
+                className="flex-1 bg-transparent border-0 outline-none px-4 py-3 text-sm text-slate-800 placeholder-slate-400 disabled:opacity-50"
               />
+
+              {/* Text Send Button */}
               <button
                 onClick={() => handleSendMessage()}
                 disabled={!inputMessage.trim() || isLoading || isRecording}
-                className={`p-2 rounded-full transition-all duration-300 ${theme.primary} disabled:opacity-40 flex items-center justify-center shadow-sm`}
+                className={`p-3 rounded-xl transition-all duration-300 ${theme.primary} disabled:opacity-40 flex items-center justify-center shadow`}
               >
-                <Send size={12} />
+                <Send size={16} />
               </button>
             </div>
 
           </div>
+
+          {/* Floating Action Button (FAB) for Voice-First Control */}
+          <div className="mt-4 pointer-events-auto relative">
+            <button
+              onClick={isRecording ? stopAudioRecording : startAudioRecording}
+              className={`h-20 w-20 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 focus:outline-none ring-4 ${theme.fab} ${
+                isRecording ? "scale-110 animate-pulse ring-rose-400" : "scale-100 hover:scale-105"
+              }`}
+              title={isRecording ? "Stop recording" : "Record voice query"}
+            >
+              {isRecording ? <MicOff size={32} className="text-white" /> : <Mic size={32} className="text-white" />}
+            </button>
+            {isRecording && (
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 whitespace-nowrap shadow-sm">
+                Recording...
+              </span>
+            )}
+          </div>
+
         </div>
 
-        {/* Modal slide-up context sheet */}
-        {isUploadModalOpen && (
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex flex-col justify-end transition-opacity duration-300">
-            {/* Backdrop close area */}
-            <div className="absolute inset-0" onClick={() => setIsUploadModalOpen(false)}></div>
-            
-            {/* Modal Body */}
-            <div className="bg-white rounded-t-[32px] p-5 space-y-4 shadow-2xl relative z-10 max-h-[85%] overflow-y-auto transform transition-transform duration-300 border-t border-slate-100 max-w-xl mx-auto w-full">
-              <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-2"></div>
-              
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm font-bold text-slate-800">Knowledge Base Ingestion</h3>
-                <button 
-                  onClick={() => setIsUploadModalOpen(false)}
-                  className="text-[10px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full"
-                >
-                  Close
-                </button>
-              </div>
-
-              {uploadStatus === "success" ? (
-                <div className="flex flex-col items-center justify-center text-center p-5 space-y-3.5 border border-dashed border-emerald-200 bg-emerald-50/30 rounded-2xl">
-                  <div className="p-3 rounded-2xl bg-emerald-100 text-emerald-700 shadow-sm">
-                    <CheckCircle size={24} />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-bold text-slate-800 break-all max-w-[260px]">
-                      {uploadedFilename}
-                    </h4>
-                    <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-                      Active Library Document
-                    </span>
-                  </div>
-
-                  <button 
-                    onClick={() => {
-                      setFile(null);
-                      setUploadStatus("idle");
-                      setUploadedFilename("");
-                      if (mode === "education") {
-                        setShikshaSuggestions(null);
-                      } else {
-                        setArogyaSuggestions(null);
-                      }
-                    }}
-                    className="text-[10px] font-bold text-rose-600 hover:text-rose-700 underline underline-offset-4 cursor-pointer pt-1"
-                  >
-                    Remove Document
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="border border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center bg-slate-50">
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                      accept=".pdf"
-                      className="hidden"
-                    />
-                    
-                    <Upload 
-                      size={28} 
-                      className={`mb-2 ${
-                        mode === "education" ? "text-orange-400" : "text-teal-500"
-                      }`} 
-                    />
-                    
-                    <button 
-                      onClick={() => fileInputRef.current?.click()}
-                      className="text-xs font-bold text-indigo-600 hover:text-indigo-700 underline underline-offset-4 cursor-pointer"
-                    >
-                      Choose PDF file
-                    </button>
-                    
-                    {file ? (
-                      <span className="text-[10px] text-slate-700 mt-2 font-medium truncate max-w-[220px]">
-                        {file.name}
-                      </span>
-                    ) : (
-                      <span className="text-[9px] text-slate-400 mt-1 leading-relaxed">
-                        Upload textbook chapters or medical reports
-                      </span>
-                    )}
-                  </div>
-
-                  {file && (
-                    <button
-                      onClick={async () => {
-                        await handleUpload();
-                      }}
-                      disabled={uploadStatus === "uploading"}
-                      className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all ${theme.primary} disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm`}
-                    >
-                      {uploadStatus === "uploading" && <Loader2 size={12} className="animate-spin" />}
-                      Ingest Document
-                    </button>
-                  )}
-
-                  {uploadStatus === "error" && (
-                    <div className="flex items-start gap-2 text-rose-800 bg-rose-50 p-2.5 rounded-xl border border-rose-200">
-                      <AlertCircle size={14} className="mt-0.5 shrink-0 text-rose-600" />
-                      <div className="text-[10px] leading-tight">
-                        <p className="font-bold">Ingestion Failed</p>
-                        <p className="text-slate-500 mt-0.5">{uploadError}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
       </div>
+      
     </div>
   );
 }
