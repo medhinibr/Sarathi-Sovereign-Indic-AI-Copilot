@@ -9,8 +9,8 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install system dependencies needed to compile python C-extensions (like hnswlib for ChromaDB)
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install system dependencies and patch package vulnerabilities
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
