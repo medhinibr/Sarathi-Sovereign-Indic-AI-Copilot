@@ -365,76 +365,99 @@ function App() {
           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Knowledge Base PDF</label>
           <div className={`flex-1 border border-dashed border-slate-300 rounded-2xl p-4 flex flex-col justify-between ${theme.card} shadow-sm`}>
             
-            {/* Upload Area */}
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-2">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept=".pdf"
-                className="hidden"
-              />
-              
-              <Upload 
-                size={32} 
-                className={`mb-3 ${
-                  mode === "education" ? "text-orange-400" : "text-teal-500"
-                }`} 
-              />
-              
-              <button 
-                onClick={() => fileInputRef.current?.click()}
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 underline underline-offset-4 cursor-pointer"
-              >
-                Choose PDF file
-              </button>
-              
-              {file ? (
-                <span className="text-xs text-slate-700 mt-2 font-medium truncate max-w-[200px]">
-                  {file.name}
-                </span>
-              ) : (
-                <span className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Upload textbook chapters or clinical documents
-                </span>
-              )}
-            </div>
+            {uploadStatus === "success" ? (
+              /* Success/Active Document View */
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-4 space-y-4">
+                <div className={`p-4 rounded-3xl ${
+                  mode === "education" ? "bg-orange-50 text-orange-600 border border-orange-200" : "bg-teal-50 text-teal-600 border border-teal-200"
+                } shadow-sm`}>
+                  <FileText size={48} />
+                </div>
+                
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-slate-800 break-all max-w-[200px]">
+                    {uploadedFilename}
+                  </h4>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Active Library Document
+                  </span>
+                </div>
 
-            {/* Upload Controls and Status Messaging */}
-            <div className="pt-4 border-t border-slate-100 space-y-3">
-              {file && uploadStatus !== "success" && (
-                <button
-                  onClick={handleUpload}
-                  disabled={uploadStatus === "uploading"}
-                  className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${theme.primary} disabled:opacity-50 flex items-center justify-center gap-1.5`}
+                <button 
+                  onClick={() => {
+                    setFile(null);
+                    setUploadStatus("idle");
+                    setUploadedFilename("");
+                  }}
+                  className="text-xs font-semibold text-rose-600 hover:text-rose-700 underline underline-offset-4 cursor-pointer pt-2"
                 >
-                  {uploadStatus === "uploading" && <Loader2 size={14} className="animate-spin" />}
-                  Ingest Document
+                  Remove & Upload New
                 </button>
-              )}
-
-              {/* Success Notification */}
-              {uploadStatus === "success" && (
-                <div className="flex items-start gap-2 text-emerald-800 bg-emerald-50 p-3 rounded-xl border border-emerald-200">
-                  <CheckCircle size={16} className="mt-0.5 shrink-0 text-emerald-600" />
-                  <div className="text-xs leading-tight">
-                    <p className="font-bold">Successfully Indexed</p>
-                    <p className="text-slate-500 mt-0.5 truncate max-w-[180px]">{uploadedFilename}</p>
-                  </div>
+              </div>
+            ) : (
+              /* Normal Upload Area */
+              <>
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept=".pdf"
+                    className="hidden"
+                  />
+                  
+                  <Upload 
+                    size={32} 
+                    className={`mb-3 ${
+                      mode === "education" ? "text-orange-400" : "text-teal-500"
+                    }`} 
+                  />
+                  
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 underline underline-offset-4 cursor-pointer"
+                  >
+                    Choose PDF file
+                  </button>
+                  
+                  {file ? (
+                    <span className="text-xs text-slate-700 mt-2 font-medium truncate max-w-[200px]">
+                      {file.name}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      Upload textbook chapters or clinical documents
+                    </span>
+                  )}
                 </div>
-              )}
 
-              {/* Error Notification */}
-              {uploadStatus === "error" && (
-                <div className="flex items-start gap-2 text-rose-800 bg-rose-50 p-3 rounded-xl border border-rose-200">
-                  <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600" />
-                  <div className="text-xs leading-tight">
-                    <p className="font-bold">Ingestion Failed</p>
-                    <p className="text-slate-500 mt-0.5">{uploadError}</p>
-                  </div>
+                {/* Upload Controls and Status Messaging */}
+                <div className="pt-4 border-t border-slate-100 space-y-3">
+                  {file && (
+                    <button
+                      onClick={handleUpload}
+                      disabled={uploadStatus === "uploading"}
+                      className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${theme.primary} disabled:opacity-50 flex items-center justify-center gap-1.5`}
+                    >
+                      {uploadStatus === "uploading" && <Loader2 size={14} className="animate-spin" />}
+                      Ingest Document
+                    </button>
+                  )}
+
+                  {/* Error Notification */}
+                  {uploadStatus === "error" && (
+                    <div className="flex items-start gap-2 text-rose-800 bg-rose-50 p-3 rounded-xl border border-rose-200">
+                      <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600" />
+                      <div className="text-xs leading-tight">
+                        <p className="font-bold">Ingestion Failed</p>
+                        <p className="text-slate-500 mt-0.5">{uploadError}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
             
           </div>
         </div>

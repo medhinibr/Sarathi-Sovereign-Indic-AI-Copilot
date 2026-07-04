@@ -108,13 +108,15 @@ def get_system_prompt(mode: str, language: str) -> str:
     base_persona = education_prompt if mode.lower() == "education" else healthcare_prompt
 
     # Script/translation rules for Indian languages
-    language_instructions = (
-        f"\n\nOutput Language Requirement: You must write your entire response in {language}. "
-        f"Use the standard script of the language (e.g., Devanagari for Hindi, Kannada script for Kannada, "
-        f"Tamil script for Tamil, etc.). If the target language is English, write in standard English. "
-        f"If a specific technical or medical term has no common translation, you may write the English term "
-        f"in parentheses next to its phonetic spelling. Avoid using emojis in your output text."
-    )
+    if language != "English":
+        language_instructions = (
+            f"\n\nCRITICAL LANGUAGE RULE: You MUST write your entire response ONLY in {language}. "
+            f"Use the standard native script of the language (e.g., Kannada script for Kannada, Devanagari for Hindi, etc.). "
+            f"Do NOT write in English, even if the user query or document context is in English. "
+            f"Translate all answers and explanations completely to {language}."
+        )
+    else:
+        language_instructions = "\n\nOutput Language Requirement: You must write your entire response in English."
 
     # Strict constraint instructions for retrieved context alignment
     context_constraint = (
@@ -150,7 +152,16 @@ def query_rag_system(query: str, mode: str, language: str) -> str:
         )
 
         system_message = get_system_prompt(mode, language)
-        user_message = f"Document Context:\n{context}\n\nUser Query: {query}"
+        
+        if language != "English":
+            user_message = (
+                f"You must translate and reply strictly in {language}.\n\n"
+                f"Document Context:\n{context}\n\n"
+                f"User Query: {query}\n\n"
+                f"Response (written in native {language} script ONLY):"
+            )
+        else:
+            user_message = f"Document Context:\n{context}\n\nUser Query: {query}"
 
         messages = [
             ("system", system_message),
