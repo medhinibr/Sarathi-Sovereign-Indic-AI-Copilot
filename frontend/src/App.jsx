@@ -430,70 +430,112 @@ function App() {
 
   if (view === "landing") {
     return (
-      <div className="min-h-screen w-screen bg-[#FAF7F2] text-slate-800 flex flex-col font-sans overflow-x-hidden relative">
+      <div 
+        className="min-h-screen w-screen text-slate-800 flex flex-col font-sans overflow-x-hidden relative"
+        style={{
+          background: `radial-gradient(circle at 50% 0%, rgba(235, 120, 40, 0.16) 0%, rgba(250, 247, 242, 0) 50%),
+                       radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.08) 0%, rgba(250, 247, 242, 0) 60%),
+                       #FAF7F2`
+        }}
+      >
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
           .indian-title {
             font-family: 'Playfair Display', serif;
+          }
+          .sarvam-serif {
+            font-family: 'Lora', serif;
           }
           body {
             font-family: 'Plus Jakarta Sans', sans-serif;
           }
-          .custom-gradient-glow {
-            background: radial-gradient(circle, rgba(217,119,6,0.06) 0%, rgba(15,118,110,0.04) 50%, rgba(250,247,242,0) 100%);
-          }
         `}</style>
 
-        {/* Ambient Gradient Background Glows */}
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] custom-gradient-glow pointer-events-none rounded-full blur-3xl z-0"></div>
-
-        {/* Top Header / Navigation */}
-        <header className="w-full h-20 px-8 lg:px-16 flex items-center justify-between border-b border-[#E5DEC9]/80 bg-[#FAF7F2]/80 backdrop-blur-md z-10 sticky top-0">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-amber-500"></span>
-            <span className="indian-title text-2xl font-bold tracking-tight text-[#1E1B4B]">Sarathi</span>
+        {/* Floating Header Pill */}
+        <header className="w-[90%] max-w-6xl mx-auto my-6 bg-white/80 backdrop-blur-md rounded-full px-8 py-3.5 flex items-center justify-between border border-[#E5DEC9]/50 shadow-sm z-30 sticky top-6">
+          <div className="flex items-center gap-1">
+            <span className="text-xl font-black tracking-tight text-[#1E1B4B] font-sans lowercase">sarathi</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-600">
-            <a href="#modes" className="hover:text-[#1E1B4B] transition-colors">App Modes</a>
+          <nav className="hidden md:flex items-center gap-8 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+            <a href="#modes" className="hover:text-[#1E1B4B] transition-colors">Platform Modes</a>
             <a href="#architecture" className="hover:text-[#1E1B4B] transition-colors">Sovereign RAG</a>
           </nav>
 
-          <button
-            onClick={() => setView("chat")}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#1E1B4B] hover:bg-[#2D2A6B] text-white text-xs font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
-          >
-            Launch Copilot <Sparkles size={14} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setView("chat")}
+              className="bg-[#1E1B4B] hover:bg-[#2D2A6B] text-white text-[10px] font-extrabold uppercase tracking-wider rounded-full px-5 py-2.5 shadow-sm transition-all transform hover:-translate-y-0.5 cursor-pointer"
+            >
+              Launch Copilot
+            </button>
+            <button
+              onClick={() => window.open("https://github.com/medhinibr/Sarathi-Sovereign-Indic-AI-Copilot", "_blank")}
+              className="border border-[#E5DEC9] bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-extrabold uppercase tracking-wider rounded-full px-5 py-2.5 transition-all cursor-pointer"
+            >
+              GitHub
+            </button>
+          </div>
         </header>
 
         {/* Hero Section */}
-        <section className="flex-1 max-w-6xl mx-auto px-8 lg:px-16 flex flex-col items-center justify-center text-center py-20 lg:py-28 relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-full text-[10px] font-bold uppercase tracking-widest">
-            <Sparkles size={10} className="text-amber-600" /> Voice-First Sovereign AI
+        <section className="flex-1 max-w-6xl mx-auto px-8 lg:px-16 flex flex-col items-center justify-center text-center py-20 lg:py-24 relative z-10 space-y-8">
+          {/* Swirl Flourish Ornament */}
+          <div className="w-full flex justify-center opacity-70">
+            <svg className="w-32 h-8 text-amber-600/70" viewBox="0 0 120 30" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M10 15 C 30 15, 35 5, 45 15 C 50 20, 55 20, 60 15" />
+              <path d="M20 15 C 25 10, 30 10, 35 15 C 38 18, 42 18, 45 15" />
+              <path d="M110 15 C 90 15, 85 5, 75 15 C 70 20, 65 20, 60 15" />
+              <path d="M100 15 C 95 10, 90 10, 85 15 C 82 18, 78 18, 75 15" />
+              <path d="M60 5 C 58 10, 62 10, 60 15" />
+              <circle cx="60" cy="15" r="1.5" fill="currentColor" />
+              <circle cx="50" cy="15" r="1" fill="currentColor" />
+              <circle cx="70" cy="15" r="1" fill="currentColor" />
+            </svg>
           </div>
 
-          <h1 className="indian-title text-5xl lg:text-7xl font-bold tracking-tight text-[#1E1B4B] leading-tight max-w-4xl">
-            Empowering Rural India with Sovereign Context-Bound AI
-          </h1>
+          <div className="space-y-3">
+            <p className="text-[#3B82F6] text-xs font-bold uppercase tracking-widest">
+              India's Sovereign AI Copilot
+            </p>
+            <h1 className="sarvam-serif text-5xl lg:text-7xl font-semibold tracking-tight text-slate-900 leading-tight max-w-4xl">
+              AI for all from India
+            </h1>
+          </div>
 
-          <p className="text-base lg:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-medium">
-            Bridging language barriers with real-time speech and context-bound document intelligence. Designed to assist regional educators and healthcare workers in their native languages.
+          <p className="text-base lg:text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed font-sans">
+            Built on sovereign data. Powered by frontier-class Indic models. Delivering village-level agricultural and clinical documentation impact.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <button
               onClick={() => setView("chat")}
-              className="w-full sm:w-auto px-8 py-4 bg-[#D97706] hover:bg-[#B45309] text-white text-sm font-bold rounded-2xl shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#1E1B4B] hover:bg-[#2D2A6B] text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
             >
-              Start Chat Assistant <ChevronRight size={16} />
+              Launch Copilot
             </button>
             <a
               href="#modes"
-              className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-[#E5DEC9] hover:bg-[#FAF7F2] text-slate-700 text-sm font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 bg-white border border-[#E5DEC9] hover:bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-full transition-all flex items-center justify-center gap-2"
             >
-              Explore Use Cases
+              Explore Modes
             </a>
+          </div>
+
+          {/* India Builds With Sarathi Logos */}
+          <div className="w-full pt-16 lg:pt-24 space-y-6">
+            <p className="text-[10px] text-slate-400 uppercase tracking-[0.25em] font-extrabold">
+              INDIA BUILDS WITH SARATHI
+            </p>
+            
+            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 opacity-40 grayscale contrast-200">
+              <span className="font-extrabold tracking-wider text-sm font-sans">AXIS HEALTH</span>
+              <span className="font-black tracking-widest text-sm font-mono">CRED.EDU</span>
+              <span className="font-bold tracking-tight text-sm font-sans uppercase">Decentro AI</span>
+              <span className="font-bold tracking-widest text-xs font-sans">PRIMARY SCHOOL BOARD</span>
+              <span className="font-extrabold text-sm font-mono">ASHA NETWORK</span>
+            </div>
           </div>
         </section>
 
