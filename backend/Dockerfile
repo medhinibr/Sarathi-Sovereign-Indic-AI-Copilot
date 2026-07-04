@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.10-slim-bookworm
+FROM python:3.10.14-slim-bookworm
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -7,6 +7,10 @@ ENV PYTHONUNBUFFERED=1
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Create a non-privileged user to run the application
+RUN groupadd -g 10001 appuser && \
+    useradd -u 10001 -g appuser -m -s /bin/bash appuser
 
 # Install system dependencies needed for compiling some packages
 # Running apt-get upgrade to patch security vulnerabilities in system packages
@@ -24,6 +28,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the backend application code
 COPY . .
+
+# Change ownership of /app to appuser
+RUN chown -R appuser:appuser /app
+
+# Switch to the non-privileged user
+USER appuser
 
 # Expose port 8000 for the FastAPI server
 EXPOSE 8000
