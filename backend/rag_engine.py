@@ -85,8 +85,8 @@ def ingest_pdf_bytes(file_bytes: bytes, filename: str) -> int:
         for i, chunk in enumerate(chunks)
     ]
 
-    # Batch insert to Pinecone vector store
-    vector_db.add_documents(documents)
+    # Batch insert to Pinecone vector store synchronously to avoid multiprocessing error on Vercel/Lambda
+    vector_db.add_documents(documents, async_req=False)
     
     return len(documents)
 
