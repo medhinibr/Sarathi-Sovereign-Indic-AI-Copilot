@@ -7,14 +7,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      # Anonymous volume to shield database persistence
-      - chroma_data:/app/chroma_db
-    environment:
-      - CHROMA_PERSIST_DIR=/app/chroma_db
-      - EMBEDDINGS_PROVIDER=local
-      - LLM_API_KEY=
-      - LLM_API_BASE=https://api.openai.com/v1
-      - LLM_MODEL=gpt-3.5-turbo
+    env_file:
+      - ./backend/.env
     restart: unless-stopped
 
   frontend:
@@ -32,6 +26,3 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-
-volumes:
-  chroma_data:
