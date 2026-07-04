@@ -90,6 +90,27 @@ def ingest_pdf_bytes(file_bytes: bytes, filename: str) -> int:
     
     return len(documents)
 
+def translate_query_to_english(query: str, groq_api_key: str) -> str:
+    """
+    Translates non-English queries into English to ensure similarity search matches English vector index.
+    """
+    try:
+        # Use ChatGroq with a fast model to translate
+        translator_llm = ChatGroq(
+            groq_api_key=groq_api_key,
+            model="llama-3.1-8b-instant",
+            temperature=0.0
+        )
+        messages = [
+            ("system", "You are a professional translator. Translate the user query into plain English. Respond ONLY with the translation, nothing else."),
+            ("user", query)
+        ]
+        response = translator_llm.invoke(messages)
+        return response.content.strip()
+    except Exception as e:
+        print(f"Translation helper failed: {e}")
+        return query
+
 def get_system_prompt(mode: str, language: str) -> str:
     """
     Synthesizes custom prompt guidelines defining the AI agent's behavior.
@@ -110,20 +131,16 @@ def get_system_prompt(mode: str, language: str) -> str:
     # Script/translation rules for Indian languages
     if language != "English":
         language_instructions = (
-            f"\n\nCRITICAL LANGUAGE RULE: You MUST write your entire response ONLY in {language}. "
-            f"Use the standard native script of the language (e.g., Kannada script for Kannada, Devanagari for Hindi, etc.). "
-            f"Do NOT write in English, even if the user query or document context is in English. "
-            f"Translate all answers and explanations completely to {language}."
+            f"\n\nLanguage Instruction: Write your entire response in {language} (using native {language} script/characters)."
         )
     else:
-        language_instructions = "\n\nOutput Language Requirement: You must write your entire response in English."
+        language_instructions = "\n\nLanguage Instruction: Write your response in English."
 
     # Strict constraint instructions for retrieved context alignment
     context_constraint = (
-        "\n\nConstraint: Answer the user's question query STRICTLY based on the provided context retrieved "
-        "from the document. If the answer cannot be found in the context, state that you do not have that "
-        "information in the uploaded document, and answer using general knowledge while explicitly stating "
-        "that it is general knowledge and not from the document. Do not fabricate facts."
+        "\n\nConstraint: Answer the user's query strictly based on the provided document context. "
+        "If the answer cannot be found in the context, say that the document doesn't contain this information, "
+        "and provide general knowledge instead. Do not make up facts."
     )
 
     return base_persona + language_instructions + context_constraint
@@ -138,8 +155,14 @@ def query_rag_system(query: str, mode: str, language: str) -> str:
     if not GROQ_API_KEY:
         return "Groq API Key is not configured. Please set the GROQ_API_KEY environment variable."
 
-    # Retrieve relevant source chunks from the Pinecone vector database
-    docs = vector_db.similarity_search(query, k=4)
+    # Translate query to English if the user selected language is not English
+    search_query = query
+    if language != "English":
+        search_query = translate_query_to_english(query, GROQ_API_KEY)
+        print(f"Translated query '{query}' to '{search_query}' for Pinecone search.")
+
+    # Retrieve relevant source chunks from the Pinecone vector database using the translated query
+    docs = vector_db.similarity_search(search_query, k=4)
     context_pieces = [doc.page_content for doc in docs]
     context = "\n---\n".join(context_pieces) if context_pieces else "No relevant document context found."
 
@@ -148,17 +171,17 @@ def query_rag_system(query: str, mode: str, language: str) -> str:
         llm = ChatGroq(
             groq_api_key=GROQ_API_KEY,
             model=LLM_MODEL,
-            temperature=0.3
+            temperature=0.6
         )
 
         system_message = get_system_prompt(mode, language)
         
         if language != "English":
             user_message = (
-                f"You must translate and reply strictly in {language}.\n\n"
                 f"Document Context:\n{context}\n\n"
-                f"User Query: {query}\n\n"
-                f"Response (written in native {language} script ONLY):"
+                f"User Query: {search_query}\n\n"
+                f"Please answer the user query based on the context, and translate your entire final response to {language}. "
+                f"Write the response using native {language} characters."
             )
         else:
             user_message = f"Document Context:\n{context}\n\nUser Query: {query}"
