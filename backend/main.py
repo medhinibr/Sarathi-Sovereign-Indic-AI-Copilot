@@ -8,7 +8,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional
 
-from rag_engine import ingest_pdf_bytes, query_rag_system
+from rag_engine import ingest_pdf_bytes, query_rag_system, generate_document_suggestions
 
 app = FastAPI(
     title="Sarathi Sovereign Indic AI Copilot Backend",
@@ -48,7 +48,7 @@ class TTSRequest(BaseModel):
     language: str
 
 @app.post("/api/upload")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(file: UploadFile = File(...), mode: str = Form("education")):
     """
     Endpoint to receive a PDF file and process it completely in-memory.
     Ensures zero disk writes to prevent serverless read-only filesystem crash.
@@ -64,12 +64,16 @@ async def upload_pdf(file: UploadFile = File(...)):
         file_bytes = await file.read()
         
         # Process and index PDF contents into Pinecone Cloud Vector DB
-        num_chunks = ingest_pdf_bytes(file_bytes, file.filename)
+        num_chunks, chunks = ingest_pdf_bytes(file_bytes, file.filename)
+        
+        # Generate 3 relevant suggestions from the document excerpt
+        suggestions = generate_document_suggestions(chunks, mode)
         
         return {
             "success": True,
             "filename": file.filename,
             "chunks_processed": num_chunks,
+            "suggestions": suggestions,
             "message": "Document processed in-memory and indexed to Pinecone cloud successfully."
         }
     except Exception as e:
@@ -176,9 +180,10 @@ async def text_to_speech(request: TTSRequest):
             "Content-Type": "application/json"
         }
         model = "bulbul:v2" if language_code == "en-IN" else "bulbul:v3"
+        speaker = "anushka" if language_code == "en-IN" else "meera"
         payload = {
             "text": request.text,
-            "speaker": "meera",
+            "speaker": speaker,
             "target_language_code": language_code,
             "model": model
         }

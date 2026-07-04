@@ -70,6 +70,8 @@ function App() {
   const [uploadStatus, setUploadStatus] = useState("idle"); // 'idle' | 'uploading' | 'success' | 'error'
   const [uploadedFilename, setUploadedFilename] = useState("");
   const [uploadError, setUploadError] = useState("");
+  const [shikshaSuggestions, setShikshaSuggestions] = useState(null);
+  const [arogyaSuggestions, setArogyaSuggestions] = useState(null);
 
   // Voice interaction states
   const [isRecording, setIsRecording] = useState(false);
@@ -154,6 +156,7 @@ function App() {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("mode", mode);
 
     try {
       const response = await fetch(`${API_URL}/api/upload`, {
@@ -169,6 +172,13 @@ function App() {
       const data = await response.json();
       setUploadStatus("success");
       setUploadedFilename(data.filename);
+      if (data.suggestions && data.suggestions.length > 0) {
+        if (mode === "education") {
+          setShikshaSuggestions(data.suggestions);
+        } else {
+          setArogyaSuggestions(data.suggestions);
+        }
+      }
     } catch (err) {
       setUploadStatus("error");
       setUploadError(err.message || "An error occurred during file upload.");
@@ -384,11 +394,16 @@ function App() {
                   </span>
                 </div>
 
-                <button 
+                 <button 
                   onClick={() => {
                     setFile(null);
                     setUploadStatus("idle");
                     setUploadedFilename("");
+                    if (mode === "education") {
+                      setShikshaSuggestions(null);
+                    } else {
+                      setArogyaSuggestions(null);
+                    }
                   }}
                   className="text-xs font-semibold text-rose-600 hover:text-rose-700 underline underline-offset-4 cursor-pointer pt-2"
                 >
@@ -540,7 +555,7 @@ function App() {
 
               {/* Suggestion Chips */}
               <div className="grid grid-cols-1 gap-2 pt-2 w-full">
-                {SUGGESTIONS[mode].map((suggestion, idx) => (
+                {((mode === "education" ? shikshaSuggestions : arogyaSuggestions) || SUGGESTIONS[mode]).map((suggestion, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSendMessage(suggestion)}

@@ -56,7 +56,7 @@ def extract_text_from_pdf_bytes(file_bytes: bytes) -> str:
             extracted_text.append(text)
     return "\n\n".join(extracted_text)
 
-def ingest_pdf_bytes(file_bytes: bytes, filename: str) -> int:
+def ingest_pdf_bytes(file_bytes: bytes, filename: str) -> tuple:
     """
     Ingests and indexes a PDF document entirely in-memory.
     Extracts text, chunks it, and indexes it into the cloud Pinecone vector database.
@@ -88,7 +88,53 @@ def ingest_pdf_bytes(file_bytes: bytes, filename: str) -> int:
     # Batch insert to Pinecone vector store synchronously to avoid multiprocessing error on Vercel/Lambda
     vector_db.add_documents(documents, async_req=False)
     
-    return len(documents)
+    return len(documents), chunks
+
+def generate_document_suggestions(chunks: list, mode: str) -> list:
+    """
+    Generates 3 context-specific user question suggestions based on the first few chunks of the document.
+    """
+    try:
+        if not chunks:
+            return []
+            
+        # Combine the first 3 chunks to get a good overview of the document
+        sample_context = "\n---\n".join(chunks[:3])
+        
+        llm = ChatGroq(
+            groq_api_key=GROQ_API_KEY,
+            model="llama-3.1-8b-instant",
+            temperature=0.7
+        )
+        
+        persona = "teacher assisting rural Indian students" if mode == "education" else "supportive ASHA healthcare worker"
+        
+        system_message = (
+            f"You are a helpful assistant assisting a {persona}.\n"
+            f"Based on the following document content excerpt, generate exactly 3 short, natural, user-friendly questions "
+            f"that a user might want to ask about this document. Keep each question brief (under 12 words) and easy to understand.\n"
+            f"Provide the 3 questions as a plain list, one per line. Do not number them or add any other text."
+        )
+        
+        messages = [
+            ("system", system_message),
+            ("user", f"Document Excerpt:\n{sample_context}")
+        ]
+        
+        response = llm.invoke(messages)
+        questions = [q.strip() for q in response.content.split("\n") if q.strip()]
+        
+        # Clean any numbering like "1. ", "2. ", etc. if the LLM ignored instructions
+        cleaned_questions = []
+        for q in questions:
+            cleaned_q = q.lstrip("0123456789. -*)")
+            if cleaned_q:
+                cleaned_questions.append(cleaned_q)
+        
+        return cleaned_questions[:3]
+    except Exception as e:
+        print(f"Error generating suggestions: {e}")
+        return []
 
 def translate_query_to_english(query: str, groq_api_key: str) -> str:
     """
