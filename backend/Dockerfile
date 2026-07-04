@@ -1,42 +1,54 @@
-# Use an official Python runtime as a parent image
-FROM python:3.10.14-slim-bookworm
+# ==========================================
+# Stage 1: Build Environment
+# ==========================================
+FROM python:3.11-slim-bookworm AS builder
 
-# Set environment variables
+# Prevent python from writing pyc files and buffering stdout
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Create a non-privileged user to run the application
-RUN groupadd -g 10001 appuser && \
-    useradd -u 10001 -g appuser -m -s /bin/bash appuser
-
-# Install system dependencies needed for compiling some packages
-# Running apt-get upgrade to patch security vulnerabilities in system packages
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+# Install system dependencies needed to compile python C-extensions (like hnswlib for ChromaDB)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the requirements file into the container
+# Initialize virtual environment to package all libraries cleanly
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
 COPY requirements.txt .
 
-# Install Python dependencies
-# Using --no-cache-dir to keep the image size small
+# Install dependencies into virtual environment
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the backend application code
+# Copy application files to build environment
 COPY . .
 
-# Change ownership of /app to appuser
-RUN chown -R appuser:appuser /app
+# ==========================================
+# Stage 2: Secure Distroless Runtime
+# ==========================================
+# Distroless images contain only the application and its runtime dependencies.
+# They lack package managers, shells, or auxiliary programs, removing 100% of standard OS vulnerabilities.
+FROM gcr.io/distroless/python3-debian12
 
-# Switch to the non-privileged user
-USER appuser
+WORKDIR /app
 
-# Expose port 8000 for the FastAPI server
+# Copy the pre-built virtual environment and application code from builder stage
+# Ownership is set to the default non-root user (uid: 65532, username: nonroot)
+COPY --from=builder --chown=nonroot:nonroot /opt/venv /opt/venv
+COPY --from=builder --chown=nonroot:nonroot /app /app
+
+# Configure execution environment paths
+ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONPATH="/opt/venv/lib/python3.11/site-packages"
+
+# Expose FastAPI listening port
 EXPOSE 8000
 
-# Command to run the application using uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Switch to the non-privileged nonroot user
+USER nonroot
+
+# Run the API server directly using the virtual environment uvicorn binary
+ENTRYPOINT ["/opt/venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
