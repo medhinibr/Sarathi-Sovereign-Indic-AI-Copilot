@@ -11,7 +11,7 @@ from langchain.schema import Document
 # Load environmental variables from .env file
 load_dotenv()
 
-# Configuration variables
+# Configuration variables retrieved dynamically
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "sarathi-db")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
@@ -90,22 +90,13 @@ def get_system_prompt(mode: str, language: str) -> str:
     """
     # System prompt for Education Mode
     education_prompt = (
-        "You are a helpful, enthusiastic government school teacher in India. "
-        "Your goal is to explain educational and textbook concepts in a simple, clear, "
-        "and engaging manner. Use analogies, local examples (such as village life, agricultural "
-        "concepts, or common household scenarios), and break down complex ideas step-by-step. "
-        "Be encouraging and patient."
+        "You are a rural Indian teacher. Use simple village analogies. Be warm and encouraging."
     )
 
     # System prompt for Healthcare Mode
     healthcare_prompt = (
-        "You are an empathetic, patient-focused clinical assistant. "
-        "Your task is to simplify complex clinical documents, lab reports, or medical terms. "
-        "You must explain medical concepts in simple layperson terms, using a reassuring, warm tone. "
-        "CRITICAL SAFETY WARNING: You are an AI assistant, not a doctor. You must NOT diagnose conditions, "
-        "prescribe treatments, or recommend specific medications. Your explanations must be informational only. "
-        "If the user asks for diagnosis or treatment, politely direct them to consult a qualified healthcare professional. "
-        "Always add a brief disclaimer at the end of your response noting that this information is for educational purposes."
+        "You are a supportive ASHA worker. Simplify medical terms. "
+        "STRICT SAFETY RULE: Never diagnose or prescribe medication. Always advise consulting a real doctor. Be reassuring and clear."
     )
 
     base_persona = education_prompt if mode.lower() == "education" else healthcare_prompt

@@ -12,7 +12,8 @@ import {
   AlertCircle,
   Loader2,
   HelpCircle,
-  Activity
+  Activity,
+  Globe
 } from "lucide-react";
 
 // Determine API base URL dynamically based on environment configuration
@@ -220,9 +221,11 @@ function App() {
       if (!response.ok) throw new Error("STT server error");
 
       const data = await response.json();
-      // Populate text field with transcribed text
+      // Populate text field with transcribed text and trigger chat
       if (data.text) {
         setInputMessage(data.text);
+        // Automatically send the message to make it truly Voice-First
+        handleSendMessage(data.text);
       }
     } catch (err) {
       console.error("STT transaction failed:", err);
@@ -263,69 +266,38 @@ function App() {
     }
   };
 
+  // Define dynamic themes based on selected mode
+  const theme = {
+    bg: mode === "education" ? "bg-orange-50" : "bg-teal-50",
+    text: mode === "education" ? "text-orange-950" : "text-teal-950",
+    sidebar: mode === "education" ? "bg-orange-100/60 border-orange-200" : "bg-teal-100/60 border-teal-200",
+    primary: mode === "education" ? "bg-orange-500 hover:bg-orange-600 text-white" : "bg-teal-600 hover:bg-teal-700 text-white",
+    card: mode === "education" ? "bg-white border-orange-200" : "bg-white border-teal-200",
+    fab: mode === "education" ? "bg-orange-500 hover:bg-orange-600 text-white ring-orange-300" : "bg-teal-600 hover:bg-teal-700 text-white ring-teal-300",
+    bubbleUser: "bg-indigo-600 text-white border-indigo-700",
+    bubbleBot: mode === "education" ? "bg-white border-orange-200 text-orange-950" : "bg-white border-teal-200 text-teal-950",
+    inputBg: "bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500",
+    logoColor: mode === "education" ? "text-orange-600" : "text-teal-600"
+  };
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
+    <div className={`flex h-screen w-screen overflow-hidden ${theme.bg} ${theme.text} font-sans transition-colors duration-300`}>
       
       {/* Sidebar - Control & File Upload Panel */}
-      <div className="w-80 flex flex-col border-r border-slate-800 bg-slate-900/50 p-6 space-y-6">
+      <div className={`w-80 flex flex-col border-r ${theme.sidebar} p-6 space-y-6 transition-all duration-300`}>
         
         {/* Logo and branding */}
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <span>Sarathi</span>
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <span className={`${theme.logoColor}`}>Sarathi</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">Sovereign Indic AI Copilot</p>
-        </div>
-
-        {/* Mode Toggle Switch */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Operational Mode</label>
-          <div className="grid grid-cols-2 gap-1 p-1 bg-slate-950 rounded-lg border border-slate-800">
-            <button
-              onClick={() => setMode("education")}
-              className={`flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-md transition-all ${
-                mode === "education"
-                  ? "bg-amber-600/20 text-amber-400 border border-amber-500/30"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              <BookOpen size={14} />
-              Education 🎓
-            </button>
-            <button
-              onClick={() => setMode("healthcare")}
-              className={`flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-md transition-all ${
-                mode === "healthcare"
-                  ? "bg-teal-600/20 text-teal-400 border border-teal-500/30"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              <Stethoscope size={14} />
-              Healthcare ⚕️
-            </button>
-          </div>
-        </div>
-
-        {/* Language Selection Dropdown */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Output Language</label>
-          <select
-            value={selectedLanguage}
-            onChange={(e) => setSelectedLanguage(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
-          >
-            {LANGUAGES.map((lang) => (
-              <option key={lang.code} value={lang.code}>
-                {lang.label}
-              </option>
-            ))}
-          </select>
+          <p className="text-xs text-slate-500 mt-0.5 font-medium uppercase tracking-wider">Sovereign Indic AI Copilot</p>
         </div>
 
         {/* PDF Document Ingestion Container */}
         <div className="flex-1 flex flex-col min-h-0 space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Knowledge Base PDF</label>
-          <div className="flex-1 border border-dashed border-slate-800 rounded-xl p-4 flex flex-col justify-between bg-slate-950/40">
+          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Knowledge Base PDF</label>
+          <div className={`flex-1 border border-dashed border-slate-300 rounded-2xl p-4 flex flex-col justify-between ${theme.card} shadow-sm`}>
             
             {/* Upload Area */}
             <div className="flex-1 flex flex-col items-center justify-center text-center p-2">
@@ -338,65 +310,61 @@ function App() {
               />
               
               <Upload 
-                size={28} 
+                size={32} 
                 className={`mb-3 ${
-                  mode === "education" ? "text-amber-500/60" : "text-teal-500/60"
+                  mode === "education" ? "text-orange-400" : "text-teal-500"
                 }`} 
               />
               
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="text-xs font-medium text-indigo-400 hover:text-indigo-300 underline underline-offset-4 cursor-pointer"
+                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 underline underline-offset-4 cursor-pointer"
               >
                 Choose PDF file
               </button>
               
               {file ? (
-                <span className="text-xs text-slate-300 mt-2 truncate max-w-[200px]">
+                <span className="text-xs text-slate-700 mt-2 font-medium truncate max-w-[200px]">
                   {file.name}
                 </span>
               ) : (
-                <span className="text-[10px] text-slate-500 mt-1">
+                <span className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Upload textbook chapters or clinical documents
                 </span>
               )}
             </div>
 
             {/* Upload Controls and Status Messaging */}
-            <div className="pt-4 border-t border-slate-800/60 space-y-3">
+            <div className="pt-4 border-t border-slate-100 space-y-3">
               {file && uploadStatus !== "success" && (
                 <button
                   onClick={handleUpload}
                   disabled={uploadStatus === "uploading"}
-                  className={`w-full py-2 rounded-lg text-xs font-semibold transition-all ${
-                    mode === "education"
-                      ? "bg-amber-600 hover:bg-amber-700 text-white"
-                      : "bg-teal-600 hover:bg-teal-700 text-white"
-                  } disabled:opacity-50 flex items-center justify-center gap-1.5`}
+                  className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${theme.primary} disabled:opacity-50 flex items-center justify-center gap-1.5`}
                 >
-                  {uploadStatus === "uploading" && <Loader2 size={12} className="animate-spin" />}
+                  {uploadStatus === "uploading" && <Loader2 size={14} className="animate-spin" />}
                   Ingest Document
                 </button>
               )}
 
               {/* Success Notification */}
               {uploadStatus === "success" && (
-                <div className="flex items-start gap-2 text-emerald-400 bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-900/30">
-                  <CheckCircle size={14} className="mt-0.5 shrink-0" />
-                  <div className="text-[11px] leading-tight">
-                    <p className="font-semibold">Successfully Indexed</p>
-                    <p className="text-slate-400 mt-0.5 truncate max-w-[180px]">{uploadedFilename}</p>
+                <div className="flex items-start gap-2 text-emerald-800 bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                  <CheckCircle size={16} className="mt-0.5 shrink-0 text-emerald-600" />
+                  <div className="text-xs leading-tight">
+                    <p className="font-bold">Successfully Indexed</p>
+                    <p className="text-slate-500 mt-0.5 truncate max-w-[180px]">{uploadedFilename}</p>
                   </div>
                 </div>
               )}
 
               {/* Error Notification */}
               {uploadStatus === "error" && (
-                <div className="flex items-start gap-2 text-rose-400 bg-rose-950/20 p-2.5 rounded-lg border border-rose-900/30">
-                  <AlertCircle size={14} className="mt-0.5 shrink-0" />
-                  <div className="text-[11px] leading-tight">
-                    <p className="font-semibold">Ingestion Failed</p>
-                    <p className="text-slate-400 mt-0.5">{uploadError}</p>
+                <div className="flex items-start gap-2 text-rose-800 bg-rose-50 p-3 rounded-xl border border-rose-200">
+                  <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600" />
+                  <div className="text-xs leading-tight">
+                    <p className="font-bold">Ingestion Failed</p>
+                    <p className="text-slate-500 mt-0.5">{uploadError}</p>
                   </div>
                 </div>
               )}
@@ -408,48 +376,76 @@ function App() {
       </div>
 
       {/* Main Chat Workspace */}
-      <div className="flex-1 flex flex-col bg-slate-950">
+      <div className="flex-1 flex flex-col bg-transparent relative">
         
-        {/* Dynamic Mode Header */}
-        <div className="h-16 border-b border-slate-800 px-8 flex items-center justify-between bg-slate-900/20">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${
-              mode === "education" ? "bg-amber-500/10 text-amber-400" : "bg-teal-500/10 text-teal-400"
-            }`}>
-              {mode === "education" ? <BookOpen size={18} /> : <Stethoscope size={18} />}
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-white">
-                {mode === "education" ? "Government School Teacher AI" : "Patient Assistant AI"}
-              </h2>
-              <p className="text-[10px] text-slate-400">
-                {mode === "education" ? "Explains complex textbook theories" : "Simplifies diagnostic reports & medical vocabulary"}
-              </p>
-            </div>
-          </div>
+        {/* Dynamic Mode Header with Glassmorphism */}
+        <header className="h-16 border-b border-slate-200/60 px-8 flex items-center justify-between backdrop-blur-md bg-white/70 z-10 sticky top-0">
           
-          <div className="text-xs text-slate-500 flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Agent Engine Online ({selectedLanguage})
+          {/* Mode Toggle Selector */}
+          <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-full border border-slate-200 shadow-inner">
+            <button
+              onClick={() => setMode("education")}
+              className={`flex items-center justify-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-300 ${
+                mode === "education"
+                  ? "bg-orange-500 text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              🎓 Shiksha
+            </button>
+            <button
+              onClick={() => setMode("healthcare")}
+              className={`flex items-center justify-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-300 ${
+                mode === "healthcare"
+                  ? "bg-teal-600 text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              ⚕️ Arogya
+            </button>
           </div>
-        </div>
+
+          {/* Language Selector Dropdown */}
+          <div className="flex items-center gap-2">
+            <Globe size={16} className="text-slate-400" />
+            <select
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+              className="bg-white border border-slate-200 rounded-full py-1.5 px-3 text-xs font-semibold text-slate-700 focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
+            >
+              {LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+        </header>
 
         {/* Message Feed Area */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+        <div className="flex-1 overflow-y-auto p-8 space-y-6 pb-36">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center max-w-lg mx-auto text-center space-y-4">
-              <div className="p-4 rounded-full bg-slate-900 border border-slate-800">
+            <div className="h-full flex flex-col items-center justify-center max-w-lg mx-auto text-center space-y-6">
+              <div className={`p-5 rounded-3xl bg-white border shadow-sm ${
+                mode === "education" ? "border-orange-200 text-orange-500" : "border-teal-200 text-teal-500"
+              }`}>
                 {mode === "education" ? (
-                  <HelpCircle size={32} className="text-amber-500" />
+                  <HelpCircle size={40} />
                 ) : (
-                  <Activity size={32} className="text-teal-500" />
+                  <Activity size={40} />
                 )}
               </div>
+              
               <div>
-                <h3 className="text-base font-semibold text-white">Start a Conversation</h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Upload a PDF document on the sidebar first to index it in the cloud Pinecone database. 
-                  Then, ask questions to get context-specific simplified translations.
+                <h3 className="text-2xl font-semibold tracking-tight text-slate-800">
+                  {mode === "education" ? "Shiksha AI Classroom Helper" : "Arogya Health Companion"}
+                </h3>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {mode === "education" 
+                    ? "Welcome to Shiksha Mode. Upload your textbook or lesson plan and start learning. Use voice input for quick questions."
+                    : "Welcome to Arogya Mode. Upload your clinical diagnosis or report, and we will simplify it for you. Voice-first and non-diagnostic."
+                  }
                 </p>
               </div>
 
@@ -459,7 +455,7 @@ function App() {
                   <button
                     key={idx}
                     onClick={() => handleSendMessage(suggestion)}
-                    className="text-left text-xs p-3 rounded-lg border border-slate-800 bg-slate-900/30 hover:bg-slate-900 hover:border-slate-700 transition-all text-slate-300"
+                    className={`text-left text-sm p-4 rounded-2xl border transition-all duration-300 ${theme.card} hover:shadow-md hover:border-slate-300 text-slate-700 font-medium`}
                   >
                     {suggestion}
                   </button>
@@ -476,39 +472,41 @@ function App() {
               >
                 {/* Agent Avatar */}
                 {msg.sender !== "user" && (
-                  <div className={`h-8 w-8 rounded-lg shrink-0 flex items-center justify-center ${
+                  <div className={`h-10 w-10 rounded-2xl shrink-0 flex items-center justify-center border shadow-sm ${
                     mode === "education" 
-                      ? "bg-amber-600/20 border border-amber-500/30 text-amber-400" 
-                      : "bg-teal-600/20 border border-teal-500/30 text-teal-400"
+                      ? "bg-orange-100 border-orange-200 text-orange-600" 
+                      : "bg-teal-100 border-teal-200 text-teal-600"
                   }`}>
-                    {mode === "education" ? <BookOpen size={16} /> : <Stethoscope size={16} />}
+                    {mode === "education" ? <BookOpen size={18} /> : <Stethoscope size={18} />}
                   </div>
                 )}
 
                 {/* Message Bubble */}
-                <div className={`max-w-xl rounded-xl p-4 text-sm leading-relaxed border ${
+                <div className={`max-w-xl rounded-2xl p-4 text-lg leading-relaxed border shadow-sm ${
                   msg.sender === "user"
-                    ? "bg-indigo-600/10 border-indigo-500/20 text-slate-200"
+                    ? theme.bubbleUser
                     : msg.sender === "system"
-                    ? "bg-rose-950/20 border-rose-900/30 text-rose-300"
-                    : "bg-slate-900/60 border-slate-800 text-slate-300"
+                    ? "bg-rose-50 border-rose-200 text-rose-950"
+                    : theme.bubbleBot
                 }`}>
                   <p className="whitespace-pre-line">{msg.text}</p>
                   
                   {/* TTS Trigger Control for Assistant responses */}
                   {msg.sender === "assistant" && (
-                    <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500">Audio playback</span>
+                    <div className={`mt-3 pt-3 border-t flex items-center justify-between ${
+                      mode === "education" ? "border-orange-100" : "border-teal-100"
+                    }`}>
+                      <span className="text-xs text-slate-400 font-medium">Listen to response</span>
                       <button
                         onClick={() => playTextToSpeech(msg.id, msg.text)}
                         disabled={playingMessageId !== null}
-                        className={`p-1.5 rounded hover:bg-slate-800/80 transition-colors ${
+                        className={`p-2 rounded-xl transition-colors hover:bg-slate-100 ${
                           playingMessageId === msg.id 
-                            ? "text-indigo-400 animate-pulse" 
-                            : "text-slate-400 hover:text-slate-200"
+                            ? "text-indigo-600 animate-pulse" 
+                            : "text-slate-500 hover:text-slate-700"
                         }`}
                       >
-                        <Volume2 size={14} />
+                        <Volume2 size={16} />
                       </button>
                     </div>
                   )}
@@ -516,8 +514,8 @@ function App() {
 
                 {/* User Avatar */}
                 {msg.sender === "user" && (
-                  <div className="h-8 w-8 rounded-lg shrink-0 flex items-center justify-center bg-indigo-600/20 border border-indigo-500/30 text-indigo-400">
-                    <FileText size={16} />
+                  <div className="h-10 w-10 rounded-2xl shrink-0 flex items-center justify-center bg-indigo-100 border border-indigo-200 text-indigo-600 shadow-sm">
+                    <FileText size={18} />
                   </div>
                 )}
               </div>
@@ -527,14 +525,14 @@ function App() {
           {/* Loading Indicator */}
           {isLoading && (
             <div className="flex gap-4 justify-start">
-              <div className={`h-8 w-8 rounded-lg shrink-0 flex items-center justify-center animate-pulse ${
-                mode === "education" ? "bg-amber-600/20 text-amber-400" : "bg-teal-600/20 text-teal-400"
+              <div className={`h-10 w-10 rounded-2xl shrink-0 flex items-center justify-center border animate-pulse ${
+                mode === "education" ? "bg-orange-100 border-orange-200 text-orange-600" : "bg-teal-100 border-teal-200 text-teal-600"
               }`}>
-                {mode === "education" ? <BookOpen size={16} /> : <Stethoscope size={16} />}
+                {mode === "education" ? <BookOpen size={18} /> : <Stethoscope size={18} />}
               </div>
-              <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-4 flex items-center gap-2.5">
-                <Loader2 size={16} className="animate-spin text-slate-400" />
-                <span className="text-xs text-slate-400">Assistant is synthesizing answer...</span>
+              <div className={`rounded-2xl p-4 flex items-center gap-3 border shadow-sm ${theme.card}`}>
+                <Loader2 size={18} className="animate-spin text-slate-400" />
+                <span className="text-sm text-slate-500">Synthesizing translations...</span>
               </div>
             </div>
           )}
@@ -542,52 +540,56 @@ function App() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input Bar Section */}
-        <div className="p-8 border-t border-slate-800 bg-slate-900/10">
-          <div className="max-w-3xl mx-auto flex gap-3">
+        {/* Massive Voice-First Mic FAB and Input Controls */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50/90 via-slate-50/50 to-transparent flex flex-col items-center pointer-events-none">
+          <div className="w-full max-w-2xl flex items-center gap-3 pointer-events-auto">
             
-            {/* Microphone/STT Toggle Button */}
+            {/* Input field wrapper */}
+            <div className="flex-1 flex items-center bg-white border border-slate-200 rounded-2xl shadow-md p-1.5 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all duration-300">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                placeholder={
+                  isRecording 
+                    ? "Listening..." 
+                    : `Type or click mic to talk...`
+                }
+                disabled={isRecording}
+                className="flex-1 bg-transparent border-0 outline-none px-4 py-3 text-sm text-slate-800 placeholder-slate-400 disabled:opacity-50"
+              />
+
+              {/* Text Send Button */}
+              <button
+                onClick={() => handleSendMessage()}
+                disabled={!inputMessage.trim() || isLoading || isRecording}
+                className={`p-3 rounded-xl transition-all duration-300 ${theme.primary} disabled:opacity-40 flex items-center justify-center shadow`}
+              >
+                <Send size={16} />
+              </button>
+            </div>
+
+          </div>
+
+          {/* Floating Action Button (FAB) for Voice-First Control */}
+          <div className="mt-4 pointer-events-auto relative">
             <button
               onClick={isRecording ? stopAudioRecording : startAudioRecording}
-              className={`p-3.5 rounded-xl border transition-all flex items-center justify-center ${
-                isRecording
-                  ? "bg-rose-600 border-rose-500 text-white animate-pulse"
-                  : "bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200"
+              className={`h-20 w-20 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 focus:outline-none ring-4 ${theme.fab} ${
+                isRecording ? "scale-110 animate-pulse ring-rose-400" : "scale-100 hover:scale-105"
               }`}
               title={isRecording ? "Stop recording" : "Record voice query"}
             >
-              {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
+              {isRecording ? <MicOff size={32} className="text-white" /> : <Mic size={32} className="text-white" />}
             </button>
-
-            {/* Input field */}
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-              placeholder={
-                isRecording 
-                  ? "Listening to voice input... Click mic button to stop." 
-                  : `Ask a question in operational mode...`
-              }
-              disabled={isRecording}
-              className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-100 placeholder-slate-500 transition-colors disabled:opacity-50"
-            />
-
-            {/* Send Button */}
-            <button
-              onClick={() => handleSendMessage()}
-              disabled={!inputMessage.trim() || isLoading || isRecording}
-              className={`p-3.5 rounded-xl transition-all ${
-                mode === "education"
-                  ? "bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-950/20"
-                  : "bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-950/20"
-              } disabled:opacity-50 flex items-center justify-center`}
-            >
-              <Send size={16} />
-            </button>
-
+            {isRecording && (
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 whitespace-nowrap shadow-sm">
+                Recording...
+              </span>
+            )}
           </div>
+
         </div>
 
       </div>

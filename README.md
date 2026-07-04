@@ -1,125 +1,110 @@
 # Sarathi: Sovereign Indic AI Copilot
 
-Sarathi is a production-grade, serverless-ready sovereign AI copilot proof-of-concept designed for Indian languages, Education, and Healthcare. It features a dual-mode interaction framework that acts as a government school teacher for textbook explanation (Education Mode) or an empathetic clinical assistant for simplifying document terminology (Healthcare Mode).
-
-This repository is optimized for serverless deployment on Vercel, utilizing cloud vector index hosting and direct third-party AI APIs to remain completely within serverless memory and disk execution limits.
+Sarathi is a production-ready, serverless-optimized artificial intelligence copilot designed specifically for rural Indian environments, focusing on localized Education (Shiksha Mode) and Healthcare (Arogya Mode). Built to run natively in serverless cloud environments like Vercel, the application operates entirely within strict memory constraints by utilizing cloud-based vector databases, low-latency large language model (LLM) inference engines, and real-time voice processing application programming interfaces (APIs).
 
 ---
 
-## Technical Stack
+## Why Sarathi? (Product Strategy)
 
-### Frontend
-* React.js (Vite Build Toolchain)
-* Tailwind CSS (Utility-first design system)
-* Lucide React (Icon sets)
-* HTML5 Media Capture API (In-browser audio recording)
+Sarathi addresses structural accessibility barriers in rural India through a multi-tiered deployment approach:
 
-### Backend (Serverless & Docker)
-* Python 3.11
-* FastAPI (Asynchronous framework)
-* PyPDF (In-memory PDF text extraction)
-* Uvicorn (ASGI server implementation)
-* HTTPX (Asynchronous HTTP client for voice API calls)
+### 1. Teacher-in-the-Loop Smart Classrooms
+In rural public schools, teachers use Sarathi on smart TVs and tablets as an instructional aide. It allows teachers to explain complex science and mathematical concepts to classrooms of over 50 students by simplifying textbook contents using localized, regional analogies.
 
-### AI and RAG Orchestration
-* LangChain (LLM wrappers, document splitting, and retriever orchestration)
-* Pinecone Serverless (Cloud vector database hosting)
-* Pinecone Embeddings (multilingual-e5-large model via Pinecone serverless inference)
-* ChatGroq (High-performance inference engine for LLaMA 3 models)
+### 2. Evening Homework Assistant
+Outside school hours, students access the system via their parents' mobile phones. Because text typing is a major digital literacy barrier for parents and young children, Sarathi features a voice-first interface, allowing users to ask questions verbally and receive synthesized spoken answers in their native dialects.
 
-### DevOps and Deployment
-* Vercel (Serverless host environment for SPA and API routes)
-* Docker (Containerization engine for local validation)
-* Docker Compose (Multi-container orchestration)
+### 3. Future Scalability (WhatsApp & IVR)
+The architecture is designed to support omni-channel scale. The backend services expose modular, stateless API endpoints that can be integrated directly with WhatsApp business bots or Interactive Voice Response (IVR) telephony lines. This guarantees that users without smartphones can query the knowledge bases using standard feature phones.
 
 ---
 
-## Project Structure
+## UI/UX and Safety Philosophy
 
-```
-├── api/
-│   ├── index.py            # Vercel Serverless FastAPI entrypoint
-│   └── rag_engine.py       # Pinecone and ChatGroq orchestration
-├── backend/
-│   ├── Dockerfile          # Multi-stage distroless build file for backend container
-│   ├── main.py             # FastAPI local development entrypoint
-│   ├── rag_engine.py       # Local copy of RAG module
-│   ├── requirements.txt    # Python library requirements for local development
-│   └── .env.example        # Environment template file
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx         # Modern Tailwind React workspace
-│   │   ├── index.css       # Tailwind setup and styles
-│   │   └── main.jsx        # React DOM mount point
-│   ├── Dockerfile          # Frontend container configuration
-│   ├── package.json        # Node dependency manifest
-│   ├── tailwind.config.js  # Color palette and themes
-│   └── vite.config.js      # Vite compilation parameters
-├── docker-compose.yml      # Local orchestration config
-├── vercel.json             # Vercel serverless routing config
-├── requirements.txt        # Root-level python dependencies for Vercel builds
-└── .gitignore              # Files ignored by git
-```
+### 1. Voice-First Accessibility
+The interface prioritizes speech interaction. A large, prominent Floating Action Button (FAB) at the bottom center of the screen acts as the primary touch target. It provides tactile recording feedback, encouraging voice query submission.
+
+### 2. Indic-Inspired Dynamic Theming
+The design system dynamically alters the visual theme based on the active mode:
+* Shiksha (Education) Mode: Uses warm orange tones representing educational focus, heritage, and warmth.
+* Arogya (Healthcare) Mode: Transition to clinical teal and indigo tones to establish an atmosphere of trust, safety, and clinical calm.
+
+### 3. Non-Diagnostic Medical Safety Guardrails
+In Arogya mode, the assistant functions as an ASHA worker copilot rather than a replacement for clinical professionals. The system prompt engineering enforces a non-diagnostic safety boundary. The LLM simplifies medical terms and clinical discharge summaries, but is blocked from diagnosing conditions, prescribing therapies, or recommending drug dosages. Every healthcare output contains a mandatory safety disclaimer directing patients to a qualified medical practitioner.
 
 ---
 
-## Architecture and Design Decisions
+## Technical Architecture and Stack
 
-### 1. Zero-Disk In-Memory Processing
-Vercel's serverless environment operates with a read-only filesystem. To support file ingestion, the upload API receives PDF documents as multipart file uploads, reads them directly into RAM as bytes, processes them via in-memory ByteIO streams, and extracts text without creating temporary local files.
+### Core Technology Stack
+* LLM Inference: LLaMA 3 models accessed via the Groq Cloud SDK (ChatGroq).
+* Embeddings: Pinecone Serverless inference hosting the multilingual-e5-large model (1024 dimensions).
+* Vector Storage: Pinecone Serverless cloud vector database.
+* Voice Translation: Sarvam AI Saaras v3 REST API for speech transcription.
+* Voice Synthesis: Sarvam AI Bulbul v3 REST API for text-to-speech WAV rendering.
+* Web Backend: FastAPI (Python 3.11) with HTTPX for asynchronous third-party request handling.
+* Web Frontend: React.js (Vite compiler) styled with utility-first Tailwind CSS.
 
-### 2. Cloud Vector Database and Inference
-Local vector stores (such as ChromaDB) require local database writes, and local embedding models (such as SentenceTransformers) load large weights into memory, violating Vercel's 250MB deployment size limit. Sarathi uses Pinecone Serverless to host the vector index in the cloud, utilizing Pinecone's managed multilingual-e5-large inference model for vector embeddings.
-
-### 3. Integrated Voice Capabilities
-* Speech-to-Text (STT): Direct integration with Sarvam AI's Saaras v3 REST API transcribes audio captured from the user's microphone.
-* Text-to-Speech (TTS): Direct integration with Sarvam AI's Bulbul v3 REST API maps output languages to BCP-47 codes, generates spoken responses, and streams binary audio back to the client.
-
-### 4. Strict Dual-Persona Prompt Enforcement
-Prompt configurations in the RAG engine enforce distinct personas:
-* Education Mode: Models the behavior of a government school teacher in India using analogies and local examples.
-* Healthcare Mode: Models the behavior of an empathetic assistant, explaining medical jargon in simple terms. It includes safety checks to prevent medical diagnosis and directs users to qualified professionals.
-* Script Alignment: Outputs translation text directly using the correct Indic script of the language (such as Devanagari for Hindi, Kannada script for Kannada, etc.).
+### File Orchestration
+* `vercel.json`: Handles edge configuration, routing all API requests under `/api/*` to the serverless backend, and serving the static React app.
+* `api/index.py`: Serverless endpoint router handling in-memory PDF parsing, Pinecone vector ingestion, ChatGroq LLM RAG queries, and Sarvam REST connections.
+* `api/rag_engine.py`: Encapsulates PDF chunking (RecursiveCharacterTextSplitter) and vector upload.
+* `src/App.jsx`: Renders the single-page application, handling state-based CSS variables for dynamic themer swaps and web-audio recording streams.
 
 ---
 
 ## Environment Variables Configuration
 
-To run the application, the following environment variables must be configured in your environment or in a local .env file (placed in the backend directory):
+To run the application, configure the following keys in your local environment or within your Vercel deployment console:
 
 ```env
-# Database Credentials
-PINECONE_API_KEY=your_pinecone_api_key_here
+# Vector Database Credentials
+PINECONE_API_KEY=your_pinecone_api_key
 PINECONE_INDEX_NAME=sarathi-db
 
-# Groq LLM Settings
-GROQ_API_KEY=your_groq_api_key_here
+# Large Language Model Settings
+GROQ_API_KEY=your_groq_api_key
 LLM_MODEL=llama3-8b-8192
 
 # Sarvam Voice API Key
-SARVAM_API_KEY=your_sarvam_api_key_here
+SARVAM_API_KEY=your_sarvam_api_key
 ```
-
-On Vercel, navigate to Project Settings -> Environment Variables and add the above keys.
 
 ---
 
-## Local Setup and Running
+## Local Development and Verification
 
-### Running via Docker Compose
+### Manual Service Execution
 
-Docker Compose runs the entire stack in isolated container environments.
-
-1. Ensure Docker and Docker Desktop are running on your system.
-2. Initialize the environment configuration:
+#### 1. Setup Web Server
+1. Navigate to the backend directory:
    ```bash
-   cp backend/.env.example backend/.env
+   cd backend
    ```
-3. Update the newly created backend/.env with your actual API keys.
-4. Run the build and launch command:
+2. Create and run a python virtual environment:
    ```bash
-   docker compose up --build
+   python -m venv .venv
+   source .venv/bin/activate # On Windows use: .venv\Scripts\activate
    ```
-5. Access the applications:
-   * Web Frontend: http://localhost:5173
-   * API Documentation: http://localhost:8000/docs
+3. Install packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Start the FastAPI ASGI server:
+   ```bash
+   python main.py
+   ```
+
+#### 2. Run React App
+1. Open a new terminal and move to the frontend folder:
+   ```bash
+   cd frontend
+   ```
+2. Install npm packages:
+   ```bash
+   npm install
+   ```
+3. Boot the development compiler:
+   ```bash
+   npm run dev
+   ```
