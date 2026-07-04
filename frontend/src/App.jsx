@@ -58,6 +58,7 @@ function App() {
   const [mode, setMode] = useState("education"); // 'education' or 'healthcare'
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [view, setView] = useState("landing"); // 'landing' | 'chat'
+  const [activeLandingTab, setActiveLandingTab] = useState("education"); // 'education' | 'healthcare'
   const [shikshaMessages, setShikshaMessages] = useState([]);
   const [arogyaMessages, setArogyaMessages] = useState([]);
   const messages = mode === "education" ? shikshaMessages : arogyaMessages;
@@ -454,7 +455,6 @@ function App() {
           </div>
 
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-600">
-            <a href="#features" className="hover:text-[#1E1B4B] transition-colors">Features</a>
             <a href="#modes" className="hover:text-[#1E1B4B] transition-colors">App Modes</a>
             <a href="#architecture" className="hover:text-[#1E1B4B] transition-colors">Sovereign RAG</a>
           </nav>
@@ -500,101 +500,257 @@ function App() {
         {/* Modes Section */}
         <section id="modes" className="w-full bg-[#F3EDE2]/60 border-y border-[#E5DEC9]/80 py-20 px-8 lg:px-16 relative z-10">
           <div className="max-w-6xl mx-auto space-y-12">
-            <div className="text-center space-y-2">
-              <h2 className="indian-title text-3xl lg:text-4xl font-bold text-[#1E1B4B]">Dual Dedicated Environments</h2>
-              <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Two specialized modes serving distinct societal needs</p>
+            <div className="text-center space-y-3">
+              <h2 className="indian-title text-4xl font-bold text-[#1E1B4B]">Dual Dedicated Environments</h2>
+              <p className="text-xs text-amber-800 uppercase tracking-widest font-extrabold">Tailored interfaces for specialized domain tasks</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Shiksha Card */}
-              <div className="bg-white border border-[#E5DEC9] rounded-3xl p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="space-y-4">
-                  <div className="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-200">
-                    <BookOpen size={24} />
-                  </div>
-                  <h3 className="indian-title text-2xl font-bold text-[#1E1B4B]">🎓 Shiksha Mode</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    Designed for rural classroom teachers and local students. Ingest textbooks and generate lesson plans or simplify complex scientific concepts with village analogies in Kannada, Hindi, and more.
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setMode("education");
-                    setView("chat");
-                  }}
-                  className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-[#D97706] hover:text-[#B45309] transition-colors cursor-pointer"
+            {/* Split Panel Setup */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-4">
+              
+              {/* Left Column Controls */}
+              <div className="lg:col-span-5 flex flex-col justify-center space-y-4">
+                
+                {/* Shiksha Button Selector */}
+                <div 
+                  onClick={() => setActiveLandingTab("education")}
+                  className={`p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex gap-4 ${
+                    activeLandingTab === "education" 
+                      ? "bg-white border-[#D97706] shadow-md translate-x-1" 
+                      : "bg-white/40 border-[#E5DEC9] opacity-75 hover:opacity-100"
+                  }`}
                 >
-                  Launch Shiksha Copilot <ChevronRight size={14} />
-                </button>
+                  <div className={`h-12 w-12 rounded-xl shrink-0 flex items-center justify-center border ${
+                    activeLandingTab === "education" ? "bg-amber-50 border-amber-200 text-amber-700" : "bg-slate-100 border-slate-200 text-slate-500"
+                  }`}>
+                    <BookOpen size={22} />
+                  </div>
+                  <div className="space-y-1 text-left">
+                    <h3 className="indian-title text-xl font-bold text-[#1E1B4B]">🎓 Shiksha Mode</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Custom analogies and conceptual breakdown tools tailored for regional school classrooms.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Arogya Button Selector */}
+                <div 
+                  onClick={() => setActiveLandingTab("healthcare")}
+                  className={`p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex gap-4 ${
+                    activeLandingTab === "healthcare" 
+                      ? "bg-white border-[#0F766E] shadow-md translate-x-1" 
+                      : "bg-white/40 border-[#E5DEC9] opacity-75 hover:opacity-100"
+                  }`}
+                >
+                  <div className={`h-12 w-12 rounded-xl shrink-0 flex items-center justify-center border ${
+                    activeLandingTab === "healthcare" ? "bg-teal-50 border-teal-200 text-teal-700" : "bg-slate-100 border-slate-200 text-slate-500"
+                  }`}>
+                    <Stethoscope size={22} />
+                  </div>
+                  <div className="space-y-1 text-left">
+                    <h3 className="indian-title text-xl font-bold text-[#1E1B4B]">⚕️ Arogya Mode</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Clinical report translation, vocabulary simplification and symptom analysis without diagnosis.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 text-center lg:text-left">
+                  <button
+                    onClick={() => {
+                      setMode(activeLandingTab);
+                      setView("chat");
+                    }}
+                    className={`px-6 py-3 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer ${
+                      activeLandingTab === "education" 
+                        ? "bg-[#D97706] hover:bg-[#B45309] text-white" 
+                        : "bg-[#0F766E] hover:bg-[#115E59] text-white"
+                    }`}
+                  >
+                    Open {activeLandingTab === "education" ? "Shiksha" : "Arogya"} Workspace →
+                  </button>
+                </div>
               </div>
 
-              {/* Arogya Card */}
-              <div className="bg-white border border-[#E5DEC9] rounded-3xl p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="space-y-4">
-                  <div className="h-12 w-12 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-600 border border-teal-200">
-                    <Stethoscope size={24} />
+              {/* Right Column Interactive Live Mockup Device */}
+              <div className="lg:col-span-7 bg-[#1E1B4B] rounded-3xl p-6 text-white border border-[#312E81] shadow-2xl flex flex-col justify-between min-h-[360px] relative overflow-hidden">
+                {/* Ambient glow inside device mockup */}
+                <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl"></div>
+                
+                {/* Header Mockup */}
+                <div className="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      Sarathi Sandbox - {activeLandingTab === "education" ? "Shiksha" : "Arogya"}
+                    </span>
                   </div>
-                  <h3 className="indian-title text-2xl font-bold text-[#1E1B4B]">⚕️ Arogya Mode</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    Assisting ASHA workers and rural patients. Simplifies dense English clinical documents, prescription scripts, and lab reports into easy regional language summaries, strictly omitting self-diagnosis.
-                  </p>
+                  <span className="text-[9px] bg-slate-850 px-2 py-0.5 rounded border border-slate-700 text-slate-400 font-mono">
+                    active-context: bound
+                  </span>
                 </div>
-                <button
-                  onClick={() => {
-                    setMode("healthcare");
-                    setView("chat");
-                  }}
-                  className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-[#0F766E] hover:text-[#115E59] transition-colors cursor-pointer"
-                >
-                  Launch Arogya Copilot <ChevronRight size={14} />
-                </button>
+
+                {/* Simulated Chat Feed */}
+                <div className="flex-1 space-y-4 text-xs font-medium">
+                  {activeLandingTab === "education" ? (
+                    <>
+                      {/* User Bubble */}
+                      <div className="flex justify-end">
+                        <div className="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-3.5 max-w-[85%] text-slate-200 text-left">
+                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-indigo-400 font-bold uppercase tracking-wider">
+                            <Mic size={10} /> Voice Query (Kannada)
+                          </div>
+                          ಕಿರಣಗಳು ಹೇಗೆ ಎಲೆಯಲ್ಲಿ ಆಹಾರವಾಗುತ್ತವೆ?
+                        </div>
+                      </div>
+                      
+                      {/* Bot Bubble */}
+                      <div className="flex justify-start">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 max-w-[85%] text-slate-350 text-left">
+                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-amber-500 font-bold uppercase tracking-wider">
+                            <BookOpen size={10} /> Explaining Photosynthesis
+                          </div>
+                          ಇದು ಅಮ್ಮ ಅಡುಗೆ ಮನೆಯಲ್ಲಿ ಒಲೆ ಹಚ್ಚಿ ಅಡುಗೆ ಮಾಡುವಂತೆ. ಸೂರ್ಯನ ಬೆಳಕು ಒಲೆಯ ಬೆಂಕಿ ಇದ್ದ ಹಾಗೆ, ಎಲೆಯು ಅಡುಗೆ ಪಾತ್ರೆ ಇದ್ದ ಹಾಗೆ. ಎಲೆಯು ಬೆಳಕನ್ನು ಬಳಸಿ ನೀರು ಮತ್ತು ಗಾಳಿಯಿಂದ ಗಿಡಕ್ಕೆ ಬೇಕಾದ ಆಹಾರ ತಯಾರಿಸುತ್ತದೆ.
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* User Bubble */}
+                      <div className="flex justify-end">
+                        <div className="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-3.5 max-w-[85%] text-slate-200 text-left">
+                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-indigo-400 font-bold uppercase tracking-wider">
+                            <Mic size={10} /> Voice Query (Hindi)
+                          </div>
+                          मेरी रिपोर्ट में ब्लड प्रेशर 140/90 है, इसका क्या मतलब है?
+                        </div>
+                      </div>
+                      
+                      {/* Bot Bubble */}
+                      <div className="flex justify-start">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 max-w-[85%] text-slate-350 text-left">
+                          <div className="flex items-center gap-1.5 mb-1 text-[9px] text-teal-400 font-bold uppercase tracking-wider">
+                            <Stethoscope size={10} /> Clinical Summary (Non-Diagnostic)
+                          </div>
+                          यह ब्लड प्रेशर (140/90 mmHg) सामान्य स्तर से थोड़ा अधिक है, जिसे माइल्ड हाइपरटेंशन (Mild Hypertension) कहते हैं। कृपया नमक का सेवन कम करें और उचित मार्गदर्शन के लिए अपने नजदीकी डॉक्टर या आशा कार्यकर्ता से संपर्क करें।
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Footer Input Mockup */}
+                <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                  <span>Speech-to-Speech active</span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> bulbul:v3 engine
+                  </span>
+                </div>
+
               </div>
+
             </div>
           </div>
         </section>
 
-        {/* Features / Capabilities */}
-        <section id="features" className="w-full py-20 px-8 lg:px-16 relative z-10">
+        {/* Architecture Section */}
+        <section id="architecture" className="w-full py-20 px-8 lg:px-16 relative z-10">
           <div className="max-w-6xl mx-auto space-y-12">
-            <div className="text-center space-y-2">
-              <h2 className="indian-title text-3xl lg:text-4xl font-bold text-[#1E1B4B]">Engineered for Local Accessibility</h2>
-              <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Cutting-edge Sovereign AI Technologies</p>
+            <div className="text-center space-y-3">
+              <h2 className="indian-title text-4xl font-bold text-[#1E1B4B]">Sovereign Context-Bound RAG Flow</h2>
+              <p className="text-xs text-teal-800 uppercase tracking-widest font-extrabold">End-to-End Multilingual Query Execution Pipeline</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Feature 1 */}
-              <div className="space-y-3">
-                <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-[#1E1B4B]">
-                  <Mic size={20} />
+            {/* Visualizer Flow Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-4 relative">
+              
+              {/* Step 1 */}
+              <div className="bg-white border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
+                <div className="space-y-3 text-left">
+                  <div className="inline-flex px-2 py-0.5 bg-indigo-50 border border-indigo-200 text-[#1E1B4B] rounded text-[9px] font-bold">
+                    STEP 01
+                  </div>
+                  <h4 className="font-bold text-sm text-slate-800 font-sans">Multilingual Input</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                    ASHA workers or teachers speak queries in Indic dialects or upload documents. Audio is transcribed via Sarvam's Saaras v3.
+                  </p>
                 </div>
-                <h4 className="font-bold text-base text-slate-800">Voice-First Interface</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Real-time regional transcription and natural sounding text-to-speech speaker synthesis designed for low-literacy segments.
-                </p>
+                <div className="h-1.5 w-full bg-indigo-200 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full bg-indigo-600 w-1/4 animate-pulse"></div>
+                </div>
               </div>
 
-              {/* Feature 2 */}
-              <div className="space-y-3">
-                <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-[#1E1B4B]">
-                  <Shield size={20} />
+              {/* Step 2 */}
+              <div className="bg-white border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
+                <div className="space-y-3 text-left">
+                  <div className="inline-flex px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-800 rounded text-[9px] font-bold">
+                    STEP 02
+                  </div>
+                  <h4 className="font-bold text-sm text-slate-800 font-sans">English Cross-Translation</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                    To query English document indices, the query translates internally, keeping semantic keys intact for cross-lingual matches.
+                  </p>
                 </div>
-                <h4 className="font-bold text-base text-slate-800">Strict Context Security</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Engineered with hard context-bound vector retrieval boundaries. The LLM refuses to answer when information falls outside the uploaded document.
-                </p>
+                <div className="h-1.5 w-full bg-amber-200 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full bg-amber-600 w-2/4"></div>
+                </div>
               </div>
 
-              {/* Feature 3 */}
-              <div className="space-y-3">
-                <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-[#1E1B4B]">
-                  <Languages size={20} />
+              {/* Step 3 */}
+              <div className="bg-white border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
+                <div className="space-y-3 text-left">
+                  <div className="inline-flex px-2 py-0.5 bg-teal-50 border border-teal-200 text-teal-800 rounded text-[9px] font-bold">
+                    STEP 03
+                  </div>
+                  <h4 className="font-bold text-sm text-slate-800 font-sans">Strict Context Retrieving</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                    Fetches top matching chunks from Pinecone. If context is empty, it bypasses the LLM to return translated refusal.
+                  </p>
                 </div>
-                <h4 className="font-bold text-base text-slate-800">Cross-Lingual Indexing</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Automatic translation pipeline translates regional language speech queries to English for precise vector search operations.
+                <div className="h-1.5 w-full bg-teal-200 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full bg-teal-600 w-3/4"></div>
+                </div>
+              </div>
+
+              {/* Step 4 */}
+              <div className="bg-white border border-[#E5DEC9] rounded-2xl p-5 flex flex-col justify-between shadow-sm relative hover:-translate-y-1 transition-transform duration-300">
+                <div className="space-y-3 text-left">
+                  <div className="inline-flex px-2 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded text-[9px] font-bold">
+                    STEP 04
+                  </div>
+                  <h4 className="font-bold text-sm text-slate-800 font-sans">Indic Synthesis & TTS</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                    Generates fact-bound response, translates to local language, and delivers regional speech audio via Bulbul v3.
+                  </p>
+                </div>
+                <div className="h-1.5 w-full bg-emerald-200 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full bg-emerald-600 w-full"></div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Trust Banner Inside Architecture */}
+            <div className="bg-[#1E1B4B] rounded-3xl p-8 border border-[#312E81] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-full bg-cover opacity-5 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/black-linen.png")' }}></div>
+              <div className="space-y-2 z-10 text-center md:text-left">
+                <h3 className="indian-title text-2xl font-bold">Safe, Hallucination-Free Guardrails</h3>
+                <p className="text-xs text-slate-350 max-w-xl font-sans">
+                  Unlike conventional LLMs, Sarathi operates as a closed-loop system. It has 0% tolerance for internal knowledge leakage, protecting rural patients and students from misinformation.
                 </p>
+              </div>
+              <div className="flex gap-4 shrink-0 z-10 font-sans">
+                <div className="text-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                  <div className="text-xl font-bold text-emerald-400">0%</div>
+                  <div className="text-[9px] text-slate-400 uppercase font-mono">Hallucinations</div>
+                </div>
+                <div className="text-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                  <div className="text-xl font-bold text-amber-400">10+</div>
+                  <div className="text-[9px] text-slate-400 uppercase font-mono">Indic Scripts</div>
+                </div>
               </div>
             </div>
+
           </div>
         </section>
 
